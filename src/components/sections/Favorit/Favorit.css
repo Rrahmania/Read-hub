@@ -1,0 +1,239 @@
+/* --- 1. CONTAINER UTAMA --- */
+.favorit-container {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 80vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #ffffff; /* Background Halaman Putih */
+}
+
+/* --- 2. HEADER --- */
+.favorit-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.favorit-header h2 {
+  color: #1e3c72; /* Biru Tema */
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.favorit-header p {
+  color: #65676b;
+  font-size: 1.1rem;
+}
+
+/* --- 3. GRID SYSTEM --- */
+.books-grid {
+  display: grid;
+  /* Menggunakan minmax 220px agar rapat dan muat banyak seperti referensi */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 30px;
+  justify-content: center;
+}
+
+/* --- 4. CARD DESIGN (SAMA PERSIS REFERENSI) --- */
+.book-card {
+  background-color: #f0f2f5; /* Warna Abu-abu Kartu */
+  border-radius: 30px; /* Sudut Sangat Membulat */
+  padding: 25px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  border: none; /* Hilangkan border garis */
+  height: 100%;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  background-color: #e4e6eb; /* Sedikit lebih gelap saat hover */
+}
+
+/* --- 5. GAMBAR BUKU --- */
+.card-image-area {
+  width: 140px;
+  height: 200px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); /* Bayangan hanya di buku */
+  background-color: #d1d5db;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.book-card:hover .cover-img {
+  transform: scale(1.05);
+}
+
+.placeholder-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #fff;
+}
+
+/* --- 6. INFO JUDUL --- */
+.card-info {
+  width: 100%;
+  flex: 1; /* Mendorong tombol ke bawah */
+  margin-bottom: 20px;
+}
+
+.book-title {
+  font-size: 1.1rem;
+  font-weight: 800; /* Font tebal seperti referensi */
+  color: #1c1e21;
+  margin-bottom: 5px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.book-author {
+  font-size: 0.85rem;
+  color: #65676b;
+  margin-bottom: 10px;
+}
+
+.category-tag {
+  display: inline-block;
+  background: #ffffff; /* Tag putih di atas kartu abu */
+  color: #1e3c72;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* --- 7. TOMBOL AKSI (MODIFIKASI AGAR MUAT 3 TOMBOL) --- */
+.card-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column; /* Stack vertikal agar tombol besar-besar */
+  gap: 10px;
+}
+
+/* Baris Bawah untuk Download & Hapus (Agar hemat tempat) */
+.secondary-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn {
+  border: none;
+  border-radius: 20px; /* Tombol Bulat Lonjong (Pill Shape) */
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* Tombol BACA (Penuh) */
+.btn-read {
+  width: 100%;
+  background-color: #1e3c72; /* Biru Tema */
+  color: white;
+}
+.btn-read:hover {
+  background-color: #162c55;
+}
+
+/* Tombol DOWNLOAD (Biru Muda) */
+.btn-download {
+  flex: 1; /* Setengah lebar */
+  background-color: #3b5998;
+  color: white;
+}
+.btn-download:hover {
+  background-color: #2d4373;
+}
+
+/* Tombol HAPUS (Merah tapi style senada) */
+.btn-remove {
+  flex: 1; /* Setengah lebar */
+  background-color: #e5e7eb; /* Abu-abu agak gelap */
+  color: #dc2626; /* Ikon/Teks Merah */
+}
+.btn-remove:hover {
+  background-color: #fee2e2; /* Merah muda saat hover */
+  color: #b91c1c;
+}
+
+/* --- EMPTY STATE & LOCKED --- */
+.empty-state,
+.favorit-locked {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f0f2f5; /* Background abu */
+  border-radius: 30px;
+  max-width: 500px;
+  margin: 40px auto;
+}
+
+.empty-icon,
+.lock-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.btn-cari,
+.btn-login-redirect {
+  background: #1e3c72;
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  border-radius: 50px;
+  font-weight: 700;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.btn-cari:hover,
+.btn-login-redirect:hover {
+  background-color: #162c55;
+  transform: translateY(-2px);
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .books-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  .book-card {
+    padding: 15px;
+  }
+  .card-image-area {
+    width: 100px;
+    height: 150px;
+  }
+  .btn {
+    font-size: 0.8rem; /* Font lebih kecil di HP */
+    padding: 8px 0;
+  }
+}

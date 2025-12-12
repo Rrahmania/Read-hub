@@ -1,0 +1,34 @@
+.footer {
+  background: #2d3436;
+  color: #dfe6e9;
+  padding: 50px 0 20px;
+  margin-top: auto;
+}
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.footer-brand h2 {
+  color: white;
+  margin-bottom: 15px;
+}
+.footer-contact h3 {
+  color: white;
+  margin-bottom: 15px;
+}
+.footer-bottom {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+}
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+}

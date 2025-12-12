@@ -1,0 +1,173 @@
+.hero-section {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  min-height: 90vh; /* Tinggi layar optimal */
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+
+  /* Padding agar konten naik sedikit dan tidak kena gelombang */
+  padding-top: 60px;
+  padding-bottom: 180px;
+}
+
+.hero-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 10;
+}
+
+/* --- BAGIAN TEKS --- */
+.hero-content {
+  flex: 1;
+  color: white;
+  padding-right: 30px;
+  max-width: 600px; /* Membatasi lebar teks agar tidak terlalu panjang */
+}
+
+.badge-new {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.hero-content h1 {
+  font-size: 3.8rem; /* Sedikit lebih besar */
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.text-highlight {
+  color: #89c4f4;
+}
+
+.hero-desc {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+/* Tombol Utama */
+.btn-primary {
+  background: white;
+  color: #1e3c72;
+  padding: 14px 35px;
+  border-radius: 50px;
+  font-weight: bold;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* --- BAGIAN VISUAL (LOGO) --- */
+.hero-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center; /* Pastikan logo di tengah area kanan */
+  align-items: center;
+  position: relative;
+}
+
+.visual-circle {
+  width: 450px; /* Diperbesar */
+  height: 450px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  border-radius: 50%;
+  position: absolute;
+  z-index: 1;
+}
+
+/* LOGO DIPERBESAR DI SINI */
+.hero-logo-img {
+  width: 450px; /* Ukuran diperbesar dari 350px ke 450px */
+  height: auto;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.25));
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Gelombang Bawah */
+.wave-bottom {
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  line-height: 0;
+  z-index: 1;
+}
+
+.wave-bottom svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* --- RESPONSIF --- */
+@media (max-width: 900px) {
+  .hero-section {
+    padding-top: 40px;
+    padding-bottom: 100px;
+    min-height: auto;
+  }
+
+  .hero-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-content {
+    padding-right: 0;
+    margin-bottom: 60px;
+    max-width: 100%;
+  }
+
+  .hero-content h1 {
+    font-size: 2.8rem;
+  }
+
+  /* Sesuaikan ukuran logo di HP agar tidak terlalu besar */
+  .visual-circle {
+    width: 300px;
+    height: 300px;
+  }
+  .hero-logo-img {
+    width: 280px;
+  }
+}

@@ -1,0 +1,36 @@
+.user-info-desktop {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: white;
+  font-weight: 500;
+}
+
+.logout-button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: white;
+  padding: 6px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout-button:hover {
+  background: white;
+  color: #1e3c72;
+  border-color: white;
+}
+
+.user-info-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  color: white;
+}
+.user-info-mobile .logout-button {
+  background: #ff4757;
+  border: none;
+  width: 100%;
+  padding: 10px;
+}

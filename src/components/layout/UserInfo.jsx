@@ -1,0 +1,35 @@
+import { useState } from "react";
+import "./UserInfo.css";
+import ConfirmLogoutModal from "./ConfirmLogoutModal";
+
+function UserInfo({ userEmail, onLogout, isMobile = false }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  if (!userEmail) return null;
+
+  const handleLogoutClick = () => setIsModalOpen(true);
+  const handleCancel = () => setIsModalOpen(false);
+  const handleConfirm = () => {
+    setIsModalOpen(false);
+    onLogout();
+  };
+
+  return (
+    <>
+      <div className={isMobile ? "user-info-mobile" : "user-info-desktop"}>
+        <span className="user-email">Hi, {userEmail.split("@")[0]}</span>
+        <button onClick={handleLogoutClick} className="logout-button">
+          Keluar
+        </button>
+      </div>
+
+      <ConfirmLogoutModal
+        isOpen={isModalOpen}
+        onCancel={handleCancel}
+        onConfirm={handleConfirm}
+      />
+    </>
+  );
+}
+
+export default UserInfo;
