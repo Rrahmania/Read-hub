@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getUserProgress, deleteProgress } from "../services/progressService";
+import { useToast } from "../context/ToastContext";
 import "./MyProgress.css";
 
 const MyProgress = () => {
@@ -30,16 +31,18 @@ const MyProgress = () => {
     }
   };
 
+  const { showToast } = useToast();
+
   const handleDeleteProgress = async (bookId) => {
     if (!confirm("Yakin ingin menghapus progres baca buku ini?")) return;
 
     try {
       await deleteProgress(bookId);
       await loadProgress();
-      alert("Progres berhasil dihapus!");
+      showToast("Progres berhasil dihapus", "success");
     } catch (err) {
       console.error("Error deleting progress:", err);
-      alert("Gagal menghapus progres");
+      showToast("Gagal menghapus progres", "error");
     }
   };
 
