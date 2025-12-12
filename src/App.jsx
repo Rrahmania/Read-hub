@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
@@ -94,9 +94,20 @@ function App() {
   };
 
   const handleLogout = () => {
-    setUser(null);
-    setFavorites([]);
-    localStorage.removeItem("role"); // Hapus role saat logout
+    // Sign out from Firebase auth and clear app state
+    const doLogout = async () => {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        console.warn("Firebase signOut error:", err.message);
+      }
+      setUser(null);
+      setFavorites([]);
+      localStorage.removeItem("role"); // Hapus role saat logout
+      localStorage.removeItem("token"); // remove stored token if any
+    };
+
+    void doLogout();
   };
 
   // Download buku
