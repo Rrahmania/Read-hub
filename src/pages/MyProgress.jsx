@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getUserProgress, deleteProgress } from "../services/progressService";
 import { useToast } from "../context/ToastContext";
+import ConfirmLogoutModal from "../components/layout/ConfirmLogoutModal";
 import "./MyProgress.css";
 
 const MyProgress = () => {
@@ -33,16 +34,31 @@ const MyProgress = () => {
 
   const { showToast } = useToast();
 
-  const handleDeleteProgress = async (bookId) => {
-    if (!confirm("Yakin ingin menghapus progres baca buku ini?")) return;
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [selectedProgress, setSelectedProgress] = React.useState(null);
 
+  const openDeleteConfirm = (item) => {
+    setSelectedProgress(item);
+    setConfirmOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setSelectedProgress(null);
+    setConfirmOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedProgress) return;
     try {
-      await deleteProgress(bookId);
+      await deleteProgress(selectedProgress.book_id);
       await loadProgress();
       showToast("Progres berhasil dihapus", "success");
     } catch (err) {
       console.error("Error deleting progress:", err);
       showToast("Gagal menghapus progres", "error");
+    } finally {
+      setSelectedProgress(null);
+      setConfirmOpen(false);
     }
   };
 
@@ -108,7 +124,7 @@ const MyProgress = () => {
                     Lanjutkan Membaca
                   </button>
                   <button
-                    onClick={() => handleDeleteProgress(item.book_id)}
+                    onClick={() => openDeleteConfirm(item)}
                     className="btn-delete-progress"
                   >
                     Hapus
@@ -119,6 +135,19 @@ const MyProgress = () => {
           ))}
         </div>
       )}
+      <ConfirmLogoutModal
+        isOpen={confirmOpen}
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Konfirmasi Hapus"
+        message={
+          selectedProgress
+            ? `Yakin ingin menghapus progres baca untuk "${selectedProgress.title}"?`
+            : "Yakin ingin menghapus progres baca ini?"
+        }
+        confirmText="Hapus"
+        cancelText="Batal"
+      />
     </div>
   );
 };
