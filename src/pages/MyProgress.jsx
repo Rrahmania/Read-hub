@@ -8,17 +8,18 @@ import "./MyProgress.css";
 
 const MyProgress = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [progressList, setProgressList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return; // wait for auth to initialize
     if (!user) {
       navigate("/login");
       return;
     }
     loadProgress();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const loadProgress = async () => {
     try {
