@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 
 import Navbar from "./components/layout/Navbar";
@@ -179,7 +179,7 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <BrowserRouter>
+        <Router>
           <Navbar
             userEmail={user?.email}
             userRole={user?.role}
@@ -261,7 +261,7 @@ function App() {
             </div>
 
             <Footer />
-          </BrowserRouter>
+          </Router>
         </ToastProvider>
       </AuthProvider>
     );
