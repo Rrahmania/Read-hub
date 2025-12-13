@@ -158,21 +158,21 @@
 }
 
 .btn-edit {
-  background: #007bff;
+  background: #1e90ff; /* brighter blue */
   color: white;
 }
 
 .btn-edit:hover {
-  background: #0056b3;
+  background: #0b66d1;
 }
 
 .btn-delete {
-  background: #dc3545;
+  background: #ff4d4f; /* brighter red */
   color: white;
 }
 
 .btn-delete:hover {
-  background: #c82333;
+  background: #e03335;
 }
 
 .btn-delete:disabled {
