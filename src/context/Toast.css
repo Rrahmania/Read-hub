@@ -24,18 +24,18 @@
 
 /* Tipe toast dengan warna teks berbeda agar terlihat jelas */
 .toast.success {
-  background-color: #e6ffed; /* Hijau muda */
-  color: #166534; /* Hijau gelap teks */
+  background-color: #10b981; /* brighter green */
+  color: white;
 }
 
 .toast.error {
-  background-color: #ffe6e6; /* Merah muda */
-  color: #991b1b; /* Merah gelap teks */
+  background-color: #ef4444; /* brighter red */
+  color: white;
 }
 
 .toast.info {
-  background-color: #e6f0ff; /* Biru muda */
-  color: #1e40af; /* Biru gelap teks */
+  background-color: #3b82f6; /* brighter blue */
+  color: white;
 }
 
 /* Animasi masuk */
