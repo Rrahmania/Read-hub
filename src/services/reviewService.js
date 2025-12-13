@@ -72,3 +72,34 @@ export const deleteReview = async (reviewId) => {
 
   return res.json();
 };
+
+// PATCH update review (owner or admin)
+export const updateReview = async (reviewId, rating, reviewText) => {
+  const token = await getToken();
+  const res = await fetch(`${API_URL}/${reviewId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ rating, review_text: reviewText }),
+  });
+
+  if (!res.ok) {
+    const errMsg = await res.text();
+    console.error("UpdateReview Error:", errMsg);
+    throw new Error("Gagal mengupdate review");
+  }
+
+  return res.json();
+};
+
+// GET current authenticated user info
+export const getCurrentUser = async () => {
+  const token = await getToken();
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Gagal mengambil data user");
+  return res.json();
+};
