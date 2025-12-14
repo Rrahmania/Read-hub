@@ -6,21 +6,35 @@ import { getBookProgress, saveProgress } from "../services/progressService";
 import ReviewSection from "../components/reviews/ReviewSection";
 import "./BacaBuku.css";
 
+// Pastikan Worker URL sudah benar
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 const BacaBuku = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // State untuk data buku dan PDF
   const [book, setBook] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageInput, setPageInput] = useState("1");
   const [showReviews, setShowReviews] = useState(false);
-  const [scale, setScale] = useState(1);
-  const pdfContainerRef = useRef(null);
-  const touchState = useRef({ startX: 0, startY: 0, isSwiping: false, pinchDist: 0, initialScale: 1 });
+  
+  // State untuk Zoom (scale)
+  const [scale, setScale] = useState(1.0); // Default scale 1.0
 
+  // Refs
+  const pdfContainerRef = useRef(null);
+  const touchState = useRef({ 
+    startX: 0, 
+    startY: 0, 
+    isSwiping: false, 
+    pinchDist: 0, 
+    initialScale: 1 
+  });
+
+  // --- 1. Fetch Data Buku ---
   useEffect(() => {
     async function fetchBook() {
       try {
@@ -37,7 +51,7 @@ const BacaBuku = () => {
     fetchBook();
   }, [id, navigate]);
 
-  // Load saved progress when user is logged in
+  // --- 2. Load Saved Progress ---
   useEffect(() => {
     if (user && numPages) {
       loadProgress();
@@ -48,14 +62,16 @@ const BacaBuku = () => {
     try {
       const data = await getBookProgress(id);
       if (data.hasProgress) {
-        setPageNumber(data.progress.current_page);
+        // Pastikan halaman yang dimuat tidak melebihi total halaman
+        const loadedPage = Math.min(data.progress.current_page, numPages);
+        setPageNumber(loadedPage);
       }
     } catch (err) {
       console.error("Error loading progress:", err);
     }
   };
 
-  // Save progress when page changes (debounced)
+  // --- 3. Save Progress (Debounced) ---
   useEffect(() => {
     if (user && numPages && pageNumber > 0) {
       const timer = setTimeout(() => {
@@ -75,10 +91,12 @@ const BacaBuku = () => {
     }
   };
 
+  // Sinkronisasi input halaman dengan pageNumber
   useEffect(() => {
     setPageInput(pageNumber.toString());
   }, [pageNumber]);
 
+  // Handler saat dokumen PDF berhasil dimuat
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
   }
@@ -90,11 +108,12 @@ const BacaBuku = () => {
     }
   };
 
-  const zoomIn = () => setScale((s) => Math.min(3, +(s + 0.25).toFixed(2)));
+  // --- Control Zoom ---
+  const zoomIn = () => setScale((s) => Math.min(3.0, +(s + 0.25).toFixed(2)));
   const zoomOut = () => setScale((s) => Math.max(0.5, +(s - 0.25).toFixed(2)));
-  const resetZoom = () => setScale(1);
+  const resetZoom = () => setScale(1.0);
 
-  // Touch handlers: swipe to change page, pinch to zoom
+  // --- Touch handlers: swipe to change page, pinch to zoom ---
   const onTouchStart = (e) => {
     if (e.touches.length === 1) {
       touchState.current.startX = e.touches[0].clientX;
@@ -110,25 +129,42 @@ const BacaBuku = () => {
   };
 
   const onTouchMove = (e) => {
+    // 1. Logika Swipe (ganti halaman)
     if (e.touches.length === 1 && touchState.current.isSwiping) {
+      // Jika sudah di-zoom, biarkan default browser scroll (pan) yang bekerja
+      if (scale > 1.05) return; 
+
       const deltaX = e.touches[0].clientX - touchState.current.startX;
-      const threshold = 60; // px
-      if (Math.abs(deltaX) > threshold) {
-        if (deltaX < 0) changePage(1);
-        else changePage(-1);
-        touchState.current.isSwiping = false; // avoid multiple triggers
+      const deltaY = e.touches[0].clientY - touchState.current.startY;
+      const threshold = 80; // pixel
+      const angleTolerance = 2; // toleransi untuk gerakan horizontal
+
+      // Cek apakah gerakan dominan horizontal
+      if (Math.abs(deltaX) > threshold && Math.abs(deltaX / deltaY) > angleTolerance) {
+        
+        if (deltaX < 0) changePage(1); // Swipe KIRI -> Halaman BERIKUTNYA
+        else changePage(-1); // Swipe KANAN -> Halaman SEBELUMNYA
+        
+        // Mencegah pemicu ganti halaman berulang kali dalam satu sentuhan
+        touchState.current.isSwiping = false; 
+        e.preventDefault(); 
       }
-    } else if (e.touches.length === 2) {
+    } 
+    // 2. Logika Pinch (zoom)
+    else if (e.touches.length === 2) {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const dist = Math.hypot(dx, dy);
       const ratio = dist / (touchState.current.pinchDist || dist || 1);
-      const newScale = Math.min(3, Math.max(0.5, +(touchState.current.initialScale * ratio).toFixed(2)));
+      
+      // Batasi skala antara 0.5 dan 3.0
+      const newScale = Math.min(3.0, Math.max(0.5, +(touchState.current.initialScale * ratio).toFixed(2)));
       setScale(newScale);
+      e.preventDefault(); // Mencegah default browser zoom/scroll saat pinch
     }
   };
 
-  const onTouchEnd = (e) => {
+  const onTouchEnd = () => {
     touchState.current.isSwiping = false;
   };
 
@@ -138,6 +174,7 @@ const BacaBuku = () => {
     }
   };
 
+  // --- Input Halaman ---
   const handlePageInputChange = (e) => {
     setPageInput(e.target.value);
   };
@@ -166,176 +203,175 @@ const BacaBuku = () => {
   return (
     <div>
       <div className="read-mode-container">
-      <div className="read-layout">
-        <div className="read-sidebar">
-          <div className="sidebar-cover-wrapper">
-            <img
-              src={book.cover_path}
-              alt={book.title}
-              className="sidebar-cover"
-            />
-          </div>
-          <div className="sidebar-text">
-            <h1 className="sidebar-title">{book.title}</h1>
-            <p className="sidebar-author">{book.author}</p>
-            <div className="sidebar-meta">
-              <span>{book.category}</span>
+        <div className="read-layout">
+          {/* -------------------- SIDEBAR -------------------- */}
+          <div className="read-sidebar">
+            <div className="sidebar-cover-wrapper">
+              <img
+                src={book.cover_path}
+                alt={book.title}
+                className="sidebar-cover"
+              />
             </div>
-            
-            {/* Progress Reading */}
-            {numPages && (
-              <div className="reading-progress">
-                <div className="progress-label">
-                  <span>Progress Baca</span>
-                  <span className="progress-percent">{progress}%</span>
-                </div>
-                <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-                <div className="progress-pages">
-                  Halaman {pageNumber} dari {numPages}
-                </div>
+            <div className="sidebar-text">
+              <h1 className="sidebar-title">{book.title}</h1>
+              <p className="sidebar-author">{book.author}</p>
+              <div className="sidebar-meta">
+                <span>{book.category}</span>
               </div>
-            )}
+              
+              {/* Progress Reading */}
+              {numPages && (
+                <div className="reading-progress">
+                  <div className="progress-label">
+                    <span>Progress Baca</span>
+                    <span className="progress-percent">{progress}%</span>
+                  </div>
+                  <div className="progress-bar">
+                    <div 
+                      className="progress-fill" 
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                  <div className="progress-pages">
+                    Halaman {pageNumber} dari {numPages}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="read-content-area">
-          <div className="white-paper">
-            {/* Page Navigation Top */}
-            {numPages && (
-              <div className="page-nav-top">
-                <button
-                  className="page-nav-btn"
-                  onClick={() => goToPage(1)}
-                  disabled={pageNumber === 1}
-                  title="Halaman Pertama"
-                >
-                  ⏮️
-                </button>
-                <button
-                  className="page-nav-btn"
-                  onClick={() => changePage(-1)}
-                  disabled={pageNumber <= 1}
-                  title="Halaman Sebelumnya"
-                >
-                  ◀️
-                </button>
-                
-                <form onSubmit={handlePageInputSubmit} className="page-jump">
-                  <input
-                    type="number"
-                    min="1"
-                    max={numPages}
-                    value={pageInput}
-                    onChange={handlePageInputChange}
-                    onBlur={handlePageInputBlur}
-                    className="page-input"
-                  />
-                  <span className="page-separator">/</span>
-                  <span className="total-pages">{numPages}</span>
-                </form>
+          {/* -------------------- CONTENT AREA -------------------- */}
+          <div className="read-content-area">
+            <div className="white-paper">
+              {/* Page Navigation Top */}
+              {numPages && (
+                <div className="page-nav-top">
+                  <button
+                    className="page-nav-btn"
+                    onClick={() => goToPage(1)}
+                    disabled={pageNumber === 1}
+                    title="Halaman Pertama"
+                  >
+                    ⏮️
+                  </button>
+                  <button
+                    className="page-nav-btn"
+                    onClick={() => changePage(-1)}
+                    disabled={pageNumber <= 1}
+                    title="Halaman Sebelumnya"
+                  >
+                    ◀️
+                  </button>
+                  
+                  <form onSubmit={handlePageInputSubmit} className="page-jump">
+                    <input
+                      type="number"
+                      min="1"
+                      max={numPages}
+                      value={pageInput}
+                      onChange={handlePageInputChange}
+                      onBlur={handlePageInputBlur}
+                      className="page-input"
+                    />
+                    <span className="page-separator">/</span>
+                    <span className="total-pages">{numPages}</span>
+                  </form>
 
-                <button
-                  className="page-nav-btn"
-                  onClick={() => changePage(1)}
-                  disabled={pageNumber >= numPages}
-                  title="Halaman Berikutnya"
-                >
-                  ▶️
-                </button>
-                <button
-                  className="page-nav-btn"
-                  onClick={() => goToPage(numPages)}
-                  disabled={pageNumber === numPages}
-                  title="Halaman Terakhir"
-                >
-                  ⏭️
-                </button>
-              </div>
-            )}
-
-            <div
-              className="pdf-container"
-              ref={pdfContainerRef}
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
-            >
-              {book.pdf_path ? (
-                <Document
-                  file={book.pdf_path}
-                  onLoadSuccess={onDocumentLoadSuccess}
-                  loading={
-                    <div className="loading-text">Sedang memuat PDF...</div>
-                  }
-                  error={<div className="error-text">Gagal memuat PDF.</div>}
-                >
-                  <Page
-                    pageNumber={pageNumber}
-                    renderTextLayer={false}
-                    renderAnnotationLayer={false}
-                    width={
-                      pdfContainerRef.current
-                        ? Math.max(300, Math.floor(pdfContainerRef.current.clientWidth * scale))
-                        : Math.floor(500 * scale)
-                    }
-                  />
-                </Document>
-              ) : (
-                <div className="paper-placeholder">
-                  <h3>{book.title}</h3>
-                  <p>⚠️ File PDF belum tersedia untuk buku ini.</p>
+                  <button
+                    className="page-nav-btn"
+                    onClick={() => changePage(1)}
+                    disabled={pageNumber >= numPages}
+                    title="Halaman Berikutnya"
+                  >
+                    ▶️
+                  </button>
+                  <button
+                    className="page-nav-btn"
+                    onClick={() => goToPage(numPages)}
+                    disabled={pageNumber === numPages}
+                    title="Halaman Terakhir"
+                  >
+                    ⏭️
+                  </button>
                 </div>
               )}
 
-              {/* Zoom controls moved to side controls to avoid blocking view */}
-            </div>
-
-            {/* Page Navigation Bottom */}
-            {numPages && (
-              <div className="page-nav-bottom">
-                <div className="page-info">
-                  <span className="current-page">Halaman {pageNumber}</span>
-                  <span className="page-divider">•</span>
-                  <span className="total-info">{numPages} halaman total</span>
-                </div>
+              {/* PDF Viewer Area */}
+              <div
+                className="pdf-container"
+                ref={pdfContainerRef}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
+                {book.pdf_path ? (
+                  <Document
+                    file={book.pdf_path}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    loading={
+                      <div className="loading-text">Sedang memuat PDF...</div>
+                    }
+                    error={<div className="error-text">Gagal memuat PDF.</div>}
+                  >
+                    {/* PERBAIKAN: Menggunakan properti scale bawaan react-pdf */}
+                    <Page
+                      pageNumber={pageNumber}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                      scale={scale} 
+                    />
+                  </Document>
+                ) : (
+                  <div className="paper-placeholder">
+                    <h3>{book.title}</h3>
+                    <p>⚠️ File PDF belum tersedia untuk buku ini.</p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* Side Controls */}
-        <div className="read-controls">
-          <button
-            className="nav-btn up"
-            onClick={() => changePage(-1)}
-            disabled={pageNumber <= 1}
-            title="Halaman Sebelumnya (↑)"
-          >
-            ↑
-          </button>
-          <div className="page-indicator">
-            {pageNumber}/{numPages || "?"}
+              {/* Page Navigation Bottom */}
+              {numPages && (
+                <div className="page-nav-bottom">
+                  <div className="page-info">
+                    <span className="current-page">Halaman {pageNumber}</span>
+                    <span className="page-divider">•</span>
+                    <span className="total-info">{numPages} halaman total</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="zoom-actions">
-            <button className="zoom-small" onClick={zoomOut} aria-label="Zoom out">−</button>
-            <button className="zoom-small" onClick={resetZoom} aria-label="Reset">1×</button>
-            <button className="zoom-small" onClick={zoomIn} aria-label="Zoom in">+</button>
+
+          {/* -------------------- SIDE CONTROLS -------------------- */}
+          <div className="read-controls">
+            <button
+              className="nav-btn up"
+              onClick={() => changePage(-1)}
+              disabled={pageNumber <= 1}
+              title="Halaman Sebelumnya (↑)"
+            >
+              ↑
+            </button>
+            <div className="page-indicator">
+              {pageNumber}/{numPages || "?"}
+            </div>
+            {/* Zoom Actions */}
+            <div className="zoom-actions">
+              <button className="zoom-small" onClick={zoomOut} aria-label="Zoom out">−</button>
+              <button className="zoom-small" onClick={resetZoom} aria-label="Reset">1×</button>
+              <button className="zoom-small" onClick={zoomIn} aria-label="Zoom in">+</button>
+            </div>
+            <button
+              className="nav-btn down"
+              onClick={() => changePage(1)}
+              disabled={pageNumber >= numPages}
+              title="Halaman Berikutnya (↓)"
+            >
+              ↓
+            </button>
           </div>
-          <button
-            className="nav-btn down"
-            onClick={() => changePage(1)}
-            disabled={pageNumber >= numPages}
-            title="Halaman Berikutnya (↓)"
-          >
-            ↓
-          </button>
         </div>
-      </div>
       </div>
 
       {/* Reviews Section */}
