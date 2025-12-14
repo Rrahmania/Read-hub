@@ -1,14 +1,17 @@
 :root {
-  --primary: #1e3c72;
-  --secondary: #2a5298;
-  --bg-soft: #f8faff;
+  --primary: #1e3c72; /* Dark Blue */
+  --secondary: #2a5298; /* Medium Blue */
+  --bg-soft: #f8faff; /* Very Light Blue/Grey */
   --white: #ffffff;
   --text-dark: #1e293b;
   --text-gray: #64748b;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   --border: 1px solid #eef2f6;
+  --light-gray: #e2e8f0;
+  --very-light-gray: #f1f5f9;
 }
 
+/* Base Styles */
 .read-mode-container {
   background-color: var(--bg-soft);
   min-height: 100vh;
@@ -21,7 +24,7 @@
   overflow-x: hidden;
 }
 
-/* --- LAYOUT GRID --- */
+/* --- LAYOUT GRID (Desktop) --- */
 .read-layout {
   display: flex;
   gap: 40px;
@@ -33,6 +36,7 @@
   position: relative;
 }
 
+/* Sidebar */
 .read-sidebar {
   width: 280px;
   background: var(--white);
@@ -78,8 +82,8 @@
 
 .sidebar-meta span {
   display: inline-block;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--very-light-gray);
+  color: var(--text-gray);
   padding: 6px 14px;
   border-radius: 30px;
   font-size: 0.75rem;
@@ -90,7 +94,7 @@
 .reading-progress {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--light-gray);
 }
 
 .progress-label {
@@ -111,7 +115,7 @@
 .progress-bar {
   width: 100%;
   height: 8px;
-  background: #e2e8f0;
+  background: var(--light-gray);
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 8px;
@@ -127,15 +131,17 @@
 .progress-pages {
   text-align: center;
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: var(--text-gray); /* Menggunakan variabel yang ada */
   font-weight: 600;
 }
 
+/* Content Area (PDF Viewer) */
 .read-content-area {
   flex: 1;
   display: flex;
   justify-content: center;
   width: 100%;
+  min-width: 0; /* Penting untuk flex item */
 }
 
 .white-paper {
@@ -163,21 +169,32 @@
   border-radius: 16px 16px 0 0;
 }
 
+/* **PERBAIKAN KRUSIAL UNTUK ZOOM DAN SWIPE** */
 .pdf-container {
   display: flex;
   justify-content: center;
   align-items: center;
   flex: 1;
   position: relative;
-  touch-action: none; /* enable custom swipe/pinch handling */
+  touch-action: none; /* Mencegah default browser touch actions untuk kustom swipe/pinch */
+  overflow: auto; /* Memungkinkan user untuk pan/scroll ketika di-zoom */
 }
 
 .react-pdf__Page__canvas {
-  max-width: 100% !important;
+  /* Set max-width: 100% untuk kontainer agar canvas tidak keluar dari .pdf-container saat zoom out */
+  /* Tetapi, saat zoom in, biarkan canvas meluber sehingga overflow: auto bekerja */
+  /* Kita tidak akan membatasi lebar di sini, karena lebar ditentukan oleh komponen React-PDF */
   height: auto !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
+/* Memastikan Document container juga fleksibel */
+.react-pdf__Document {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 
 .paper-placeholder {
   flex: 1;
@@ -185,29 +202,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
-  border: 2px dashed #e2e8f0;
+  color: var(--text-gray); /* Menggunakan variabel yang ada */
+  border: 2px dashed var(--light-gray);
   border-radius: 12px;
   padding: 40px;
   text-align: center;
-}
-
-.zoom-controls {
-  position: absolute;
-  right: 18px;
-  bottom: 18px;
-  display: flex;
-  gap: 8px;
-  z-index: 20;
-}
-
-.zoom-btn {
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 1rem;
 }
 
 /* Page Navigation Top */
@@ -218,14 +217,14 @@
   gap: 10px;
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 2px solid #f1f5f9;
+  border-bottom: 2px solid var(--very-light-gray);
 }
 
 .page-nav-btn {
   width: 40px;
   height: 40px;
-  border: 2px solid #e2e8f0;
-  background: white;
+  border: 2px solid var(--light-gray);
+  background: var(--white);
   border-radius: 10px;
   cursor: pointer;
   font-size: 1rem;
@@ -241,16 +240,14 @@
   border-color: var(--primary);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
-}
-
-.page-nav-btn:hover:not(:disabled) {
+  /* Efek ikon terbalik (untuk tombol dengan emoji) */
   filter: brightness(0) invert(1);
 }
 
 .page-nav-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
-  background: #f8fafc;
+  background: var(--bg-soft);
 }
 
 .page-jump {
@@ -258,9 +255,9 @@
   align-items: center;
   gap: 8px;
   padding: 0 15px;
-  background: #f8fafc;
+  background: var(--bg-soft);
   border-radius: 10px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--light-gray);
 }
 
 .page-input {
@@ -288,7 +285,7 @@
 }
 
 .total-pages {
-  color: #64748b;
+  color: var(--text-gray);
   font-weight: 600;
   font-size: 1rem;
   min-width: 40px;
@@ -299,7 +296,7 @@
 .page-nav-bottom {
   margin-top: 25px;
   padding-top: 20px;
-  border-top: 2px solid #f1f5f9;
+  border-top: 2px solid var(--very-light-gray);
 }
 
 .page-info {
@@ -320,10 +317,11 @@
 }
 
 .total-info {
-  color: #64748b;
+  color: var(--text-gray);
   font-weight: 500;
 }
 
+/* Side Controls (Zoom & Quick Nav) */
 .read-controls {
   display: flex;
   flex-direction: column;
@@ -341,7 +339,7 @@
   border-radius: 14px;
   border: none;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
+  color: var(--white);
   font-size: 1.4rem;
   cursor: pointer;
   display: flex;
@@ -363,11 +361,48 @@
   transform: none;
 }
 
+.page-indicator {
+  background: var(--white);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--light-gray);
+  white-space: nowrap;
+  text-align: center;
+  min-width: 50px;
+}
+
+.zoom-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.zoom-small {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: var(--white);
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+  transition: transform 0.1s;
+}
+
+.zoom-small:active { transform: scale(0.98); }
+
 /* Reviews Container */
 .reviews-container {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
+  width: 100%;
 }
 
 .toggle-reviews-btn {
@@ -389,41 +424,7 @@
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-.page-indicator {
-  background: white;
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 2px solid #e2e8f0;
-  white-space: nowrap;
-  text-align: center;
-  min-width: 50px;
-}
-
-.zoom-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.zoom-small {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.06);
-  background: #ffffff;
-  color: var(--primary);
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
-}
-
-.zoom-small:active { transform: scale(0.98); }
-
+/* --- MEDIA QUERIES (Mobile/Tablet) --- */
 @media (max-width: 900px) {
   .read-mode-container {
     padding-bottom: 100px;
@@ -437,6 +438,7 @@
     gap: 20px;
   }
 
+  /* Sidebar Horizontal Layout on Mobile */
   .read-sidebar {
     width: 100%;
     position: relative;
@@ -456,9 +458,11 @@
     margin-bottom: 0;
     flex-shrink: 0;
   }
-
-  .sidebar-info {
+  
+  /* Container for text inside sidebar on mobile */
+  .sidebar-text {
     flex: 1;
+    min-width: 0; /* Penting untuk mencegah overflow text */
   }
 
   .sidebar-title {
@@ -468,6 +472,14 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Progress area layout adjustment on mobile */
+  .reading-progress {
+    margin-top: 15px;
+    padding-top: 15px;
+    width: 100%; /* Agar progress bar mengambil sisa ruang */
+  }
+
 
   .white-paper {
     padding: 25px 20px;
@@ -508,11 +520,7 @@
     flex-wrap: wrap;
   }
 
-  .reading-progress {
-    margin-top: 15px;
-    padding-top: 15px;
-  }
-
+  /* Mobile Bottom Controls (Fixed) */
   .read-controls {
     flex-direction: row;
     position: fixed;
@@ -529,13 +537,25 @@
     gap: 15px;
   }
 
-  .zoom-actions { flex-direction: row; }
+  .zoom-actions { 
+    flex-direction: row; 
+    margin-top: 0; /* Reset margin top */
+  }
 
-  .zoom-small { width: 40px; height: 40px; border-radius: 12px; }
+  .zoom-small { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 12px; 
+  }
 
   .nav-btn {
     width: 45px;
     height: 45px;
+  }
+  
+  /* Sembunyikan panah atas/bawah yang tidak lagi relevan di mobile fixed bar */
+  .nav-btn.up, .nav-btn.down {
+      font-size: 1.2rem;
   }
 
   .page-indicator {
