@@ -292,12 +292,7 @@ const BacaBuku = () => {
                 </div>
               )}
 
-              {/* Zoom Controls (mobile-friendly) */}
-              <div className="zoom-controls">
-                <button className="zoom-btn" onClick={zoomOut} aria-label="Zoom out">−</button>
-                <button className="zoom-btn" onClick={resetZoom} aria-label="Reset zoom">Reset</button>
-                <button className="zoom-btn" onClick={zoomIn} aria-label="Zoom in">+</button>
-              </div>
+              {/* Zoom controls moved to side controls to avoid blocking view */}
             </div>
 
             {/* Page Navigation Bottom */}
@@ -325,6 +320,11 @@ const BacaBuku = () => {
           </button>
           <div className="page-indicator">
             {pageNumber}/{numPages || "?"}
+          </div>
+          <div className="zoom-actions">
+            <button className="zoom-small" onClick={zoomOut} aria-label="Zoom out">−</button>
+            <button className="zoom-small" onClick={resetZoom} aria-label="Reset">1×</button>
+            <button className="zoom-small" onClick={zoomIn} aria-label="Zoom in">+</button>
           </div>
           <button
             className="nav-btn down"
