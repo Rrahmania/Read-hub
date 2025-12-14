@@ -403,6 +403,27 @@
   min-width: 50px;
 }
 
+.zoom-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.zoom-small {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: #ffffff;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+}
+
+.zoom-small:active { transform: scale(0.98); }
+
 @media (max-width: 900px) {
   .read-mode-container {
     padding-bottom: 100px;
@@ -507,6 +528,10 @@
     border: 2px solid rgba(255, 255, 255, 0.8);
     gap: 15px;
   }
+
+  .zoom-actions { flex-direction: row; }
+
+  .zoom-small { width: 40px; height: 40px; border-radius: 12px; }
 
   .nav-btn {
     width: 45px;
