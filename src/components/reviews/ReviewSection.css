@@ -156,23 +156,35 @@
   font-size: 0.9rem;
   transition: all 0.3s;
 }
+
 .btn-edit {
-.btn-edit {
-  background: #007bff;
-  color: white;
+  background: #0b7dda; /* solid, balanced blue */
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(11, 125, 218, 0.18);
+  font-weight: 700;
+  padding: 0.55rem 1.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .btn-edit:hover {
-  background: #0056b3;
+  background: #095fb0;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(9, 95, 176, 0.22);
 }
 
 .btn-delete {
-  background: #dc3545;
-  color: white;
+  background: #ff3b30; /* vivid, high-contrast red */
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(255, 59, 48, 0.18);
+  font-weight: 700;
+  padding: 0.55rem 1.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .btn-delete:hover {
-  background: #c82333;
+  background: #c92b22;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(201, 43, 34, 0.22);
 }
 
 .btn-delete:disabled {
@@ -334,4 +346,5 @@
   .btn-cancel {
     width: 100%;
   }
+}
 }
