@@ -46,9 +46,6 @@ function Navbar({ userEmail, userRole, onLogout, isAuthenticated }) {
                     <Link to="/manage-books" className="btn-manage-books">
                       📚 Kelola Buku
                     </Link>
-                    <Link to="/add-book" className="btn-add-book">
-                      ➕ Tambah Buku
-                    </Link>
                   </>
                 )}
                 <UserInfo
