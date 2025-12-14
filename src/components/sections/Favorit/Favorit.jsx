@@ -1,7 +1,8 @@
 // src/components/sections/Favorit/Favorit.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "../../../context/ToastContext";
+import { getBookReviews } from "../../../services/reviewService";
 import "./Favorit.css";
 
 const Favorit = ({
@@ -12,15 +13,53 @@ const Favorit = ({
 }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [bookRatings, setBookRatings] = useState({});
+  const [loadingRatings, setLoadingRatings] = useState(false);
 
-  const handleDownload = (book) => {
-    if (onDownload) {
-      onDownload(book, showToast);
+  // Load ratings untuk semua buku favorit
+  useEffect(() => {
+    if (favoriteList.length > 0) {
+      loadBookRatings();
+    }
+  }, [favoriteList]);
+
+  const loadBookRatings = async () => {
+    setLoadingRatings(true);
+    try {
+      const ratings = {};
+      for (const book of favoriteList) {
+        try {
+          const data = await getBookReviews(book.id);
+          if (data.statistics) {
+            ratings[book.id] = data.statistics;
+          }
+        } catch (err) {
+          console.error(`Error loading rating for book ${book.id}:`, err);
+        }
+      }
+      setBookRatings(ratings);
+    } catch (err) {
+      console.error("Error loading book ratings:", err);
+    } finally {
+      setLoadingRatings(false);
     }
   };
 
-  const handleRemove = (book) => {
-    if (onRemoveFavorite) onRemoveFavorite(book, showToast);
+  const renderStars = (rating) => {
+    return (
+      <div style={{ display: "flex", gap: "2px", fontSize: "0.9rem" }}>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            style={{
+              color: star <= Math.round(rating) ? "#ffc107" : "#ddd",
+            }}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -74,6 +113,14 @@ const Favorit = ({
                     <span className="category-tag">
                       {book.category || "Umum"}
                     </span>
+                    {bookRatings[book.id] && (
+                      <div style={{ marginTop: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        {renderStars(bookRatings[book.id].average_rating || 0)}
+                        <span style={{ fontSize: "0.85rem", color: "#666" }}>
+                          {parseFloat(bookRatings[book.id].average_rating || 0).toFixed(1)}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="card-buttons">
@@ -85,13 +132,13 @@ const Favorit = ({
                     </button>
                     <button
                       className="btn btn-download"
-                      onClick={() => handleDownload(book)}
+                      onClick={() => onDownload(book, showToast)}
                     >
                       ⬇️ Download
                     </button>
                     <button
                       className="btn btn-remove"
-                      onClick={() => handleRemove(book)}
+                      onClick={() => onRemoveFavorite(book, showToast)}
                     >
                       🗑️ Hapus
                     </button>
