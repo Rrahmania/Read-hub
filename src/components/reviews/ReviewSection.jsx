@@ -298,10 +298,9 @@ const ReviewSection = ({ bookId }) => {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {renderStars(review.rating)}
-                  {user && (
-                    (currentUserInfo && currentUserInfo.role === "admin") ||
-                    review.user_id === user.uid
-                  ) && (
+                  {user && currentUserInfo && (
+                    (currentUserInfo.role === "admin" ||
+                      review.user_id === user.uid) && (
                     <div style={{ display: "flex", gap: 8 }}>
                       <button className="btn-edit" onClick={() => handleStartEdit(review)}>
                         Edit
@@ -310,6 +309,7 @@ const ReviewSection = ({ bookId }) => {
                         Hapus
                       </button>
                     </div>
+                    )
                   )}
                 </div>
               </div>
