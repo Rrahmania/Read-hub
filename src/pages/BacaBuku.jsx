@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useAuth } from "../context/AuthContext";
@@ -17,6 +17,9 @@ const BacaBuku = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageInput, setPageInput] = useState("1");
   const [showReviews, setShowReviews] = useState(false);
+  const [scale, setScale] = useState(1);
+  const pdfContainerRef = useRef(null);
+  const touchState = useRef({ startX: 0, startY: 0, isSwiping: false, pinchDist: 0, initialScale: 1 });
 
   useEffect(() => {
     async function fetchBook() {
@@ -85,6 +88,48 @@ const BacaBuku = () => {
     if (newPage >= 1 && newPage <= numPages) {
       setPageNumber(newPage);
     }
+  };
+
+  const zoomIn = () => setScale((s) => Math.min(3, +(s + 0.25).toFixed(2)));
+  const zoomOut = () => setScale((s) => Math.max(0.5, +(s - 0.25).toFixed(2)));
+  const resetZoom = () => setScale(1);
+
+  // Touch handlers: swipe to change page, pinch to zoom
+  const onTouchStart = (e) => {
+    if (e.touches.length === 1) {
+      touchState.current.startX = e.touches[0].clientX;
+      touchState.current.startY = e.touches[0].clientY;
+      touchState.current.isSwiping = true;
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchState.current.pinchDist = Math.hypot(dx, dy);
+      touchState.current.initialScale = scale;
+      touchState.current.isSwiping = false;
+    }
+  };
+
+  const onTouchMove = (e) => {
+    if (e.touches.length === 1 && touchState.current.isSwiping) {
+      const deltaX = e.touches[0].clientX - touchState.current.startX;
+      const threshold = 60; // px
+      if (Math.abs(deltaX) > threshold) {
+        if (deltaX < 0) changePage(1);
+        else changePage(-1);
+        touchState.current.isSwiping = false; // avoid multiple triggers
+      }
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const ratio = dist / (touchState.current.pinchDist || dist || 1);
+      const newScale = Math.min(3, Math.max(0.5, +(touchState.current.initialScale * ratio).toFixed(2)));
+      setScale(newScale);
+    }
+  };
+
+  const onTouchEnd = (e) => {
+    touchState.current.isSwiping = false;
   };
 
   const goToPage = (page) => {
@@ -213,7 +258,13 @@ const BacaBuku = () => {
               </div>
             )}
 
-            <div className="pdf-container">
+            <div
+              className="pdf-container"
+              ref={pdfContainerRef}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               {book.pdf_path ? (
                 <Document
                   file={book.pdf_path}
@@ -227,7 +278,11 @@ const BacaBuku = () => {
                     pageNumber={pageNumber}
                     renderTextLayer={false}
                     renderAnnotationLayer={false}
-                    width={500}
+                    width={
+                      pdfContainerRef.current
+                        ? Math.max(300, Math.floor(pdfContainerRef.current.clientWidth * scale))
+                        : Math.floor(500 * scale)
+                    }
                   />
                 </Document>
               ) : (
@@ -236,6 +291,13 @@ const BacaBuku = () => {
                   <p>⚠️ File PDF belum tersedia untuk buku ini.</p>
                 </div>
               )}
+
+              {/* Zoom Controls (mobile-friendly) */}
+              <div className="zoom-controls">
+                <button className="zoom-btn" onClick={zoomOut} aria-label="Zoom out">−</button>
+                <button className="zoom-btn" onClick={resetZoom} aria-label="Reset zoom">Reset</button>
+                <button className="zoom-btn" onClick={zoomIn} aria-label="Zoom in">+</button>
+              </div>
             </div>
 
             {/* Page Navigation Bottom */}
