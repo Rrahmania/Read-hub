@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useEffect, useState } from "react";
 import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
@@ -28,6 +27,7 @@ import "./App.css";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
   const [books, setBooks] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
@@ -38,17 +38,35 @@ function App() {
   // Cek login Firebase saat app mount
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        // User masih login, simpan ke state
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          role: localStorage.getItem("role") || "user", // Ambil role dari localStorage
-        });
-      } else {
-        setUser(null);
-        setFavorites([]);
-      }
+      (async () => {
+        try {
+          if (firebaseUser) {
+            // Try fetch role from backend /api/auth/me using Firebase token
+            let role = localStorage.getItem("role") || "user";
+            try {
+              const token = await firebaseUser.getIdToken();
+              const res = await fetch(`${BASE.replace(/\/$/, "")}/api/auth/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (res.ok) {
+                const info = await res.json();
+                role = info.role || role;
+                localStorage.setItem("role", role);
+              }
+            } catch (err) {
+              console.warn("Could not fetch user role:", err.message || err);
+            }
+
+            setUser({ uid: firebaseUser.uid, email: firebaseUser.email, role });
+          } else {
+            setUser(null);
+            setFavorites([]);
+            localStorage.removeItem("role");
+          }
+        } finally {
+          setAuthReady(true);
+        }
+      })();
     });
 
     return () => unsubscribe();
@@ -224,11 +242,17 @@ function App() {
             />
             <Route path="/baca/:id" element={<BacaBuku />} />
             <Route path="/read/:id" element={<BacaBuku />} />
-            <Route 
-              path="/my-progress" 
+            <Route
+              path="/my-progress"
               element={
-                user ? <MyProgress /> : <Navigate to="/login" />
-              } 
+                !authReady ? (
+                  <div style={{ padding: 24 }}>Memuat...</div>
+                ) : user ? (
+                  <MyProgress />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
             />
             <Route
               path="/add-book"
