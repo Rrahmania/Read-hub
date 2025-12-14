@@ -14,7 +14,7 @@ function NavMenu({
     { to: "/", label: "Beranda" },
     { to: "/books", label: "Koleksi Buku" },
     { to: "/favorites", label: "Favorit Saya" },
-    ...(isAuthenticated ? [{ to: "/my-progress", label: "Progres Baca" }] : []),
+    ...(isAuthenticated ? [{ to: "/my-progress", label: "Bookmark" }] : []),
   ];
 
   return (
@@ -38,14 +38,9 @@ function NavMenu({
       <div className="mobile-auth">
         {/* Tombol Admin */}
         {isAuthenticated && userRole === "admin" && (
-          <>
-            <Link to="/manage-books" className="mobile-btn" onClick={onClose}>
-              📚 Kelola Buku
-            </Link>
-            <Link to="/add-book" className="mobile-btn" onClick={onClose}>
-              ➕ Tambah Buku
-            </Link>
-          </>
+          <Link to="/manage-books" className="mobile-btn" onClick={onClose}>
+            📚 Kelola Buku
+          </Link>
         )}
 
         {isAuthenticated && userEmail ? (
