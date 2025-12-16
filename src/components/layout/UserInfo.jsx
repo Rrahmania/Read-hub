@@ -20,6 +20,15 @@ function UserInfo({ userEmail, onLogout, isMobile = false }) {
     <>
       <div className={isMobile ? "user-info-mobile" : "user-info-desktop"}>
         <span className="user-email">Hi, {userEmail.split("@")[0]}</span>
+        <button 
+          onClick={startTutorial} 
+          className="guide-button"
+          title="Tampilkan panduan tutorial"
+        >
+        </button>
+        <button onClick={handleLogoutClick} className="logout-button">
+          Keluar
+        </button>
       </div>
 
       <ConfirmLogoutModal
@@ -32,4 +41,3 @@ function UserInfo({ userEmail, onLogout, isMobile = false }) {
 }
 
 export default UserInfo;
-
