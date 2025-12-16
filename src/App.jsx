@@ -18,6 +18,7 @@ import ForgotPassword from "./components/auth/ForgotPassword";
 
 import KoleksiBuku from "./components/sections/KoleksiBuku/KoleksiBuku";
 import Favorit from "./components/sections/Favorit/Favorit";
+import OnboardingTutorial from "./components/onboarding/OnboardingTutorial";
 
 import { getBooks } from "./services/bookService";
 import { ToastProvider } from "./context/ToastContext";
