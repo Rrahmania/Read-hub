@@ -1,23 +1,36 @@
 :root {
-  --primary: #1e3c72;
-  --secondary: #2a5298;
-  --bg-soft: #f8faff;
-  --white: #ffffff;
-  --text-dark: #1e293b;
-  --text-gray: #64748b;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  --border: 1px solid #eef2f6;
+  /* --- Color Palette --- */
+  --color-primary: #1e3c72; /* Blue-Dark */
+  --color-secondary: #2a5298; /* Blue-Medium */
+  --color-white: #ffffff;
+  --color-text-dark: #1e293b; /* Slate-900 */
+  --color-text-gray: #64748b; /* Slate-500 */
+  --color-bg-soft: #f8faff; /* Lightest Background */
+  --color-light-gray: #f1f5f9; /* Slate-100 - For light accents/backgrounds */
+  --color-border-light: #e2e8f0; /* Slate-200 - For main dividers/borders */
+  --color-border-subtle: #eef2f6; /* Lighter Border */
+  --color-placeholder: #94a3b8; /* Slate-400 */
+  --color-separator: #cbd5e1; /* Slate-300 */
+
+  /* --- Spacing, Shadows, and Borders --- */
+  --shadow-base: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --shadow-paper: 0 20px 40px rgba(30, 60, 114, 0.08);
+  --border-main: 1px solid var(--color-border-subtle);
+  
+  /* --- Typography --- */
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Base Container and Global Reset */
 .read-mode-container {
-  background-color: var(--bg-soft);
+  background-color: var(--color-bg-soft);
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100dvh; /* Using 'dvh' for better mobile support */
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-body);
   overflow-x: hidden;
 }
 
@@ -27,20 +40,20 @@
   gap: 40px;
   width: 100%;
   max-width: 1280px;
-  padding: 60px 20px 60px;
+  padding: 60px 20px;
   align-items: flex-start;
   justify-content: center;
-  position: relative;
 }
 
+/* --- SIDEBAR (Meta Info) --- */
 .read-sidebar {
   width: 280px;
-  background: var(--white);
+  background: var(--color-white);
   padding: 25px;
   border-radius: 20px;
   text-align: center;
-  box-shadow: var(--shadow);
-  border: var(--border);
+  box-shadow: var(--shadow-base);
+  border: var(--border-main);
   position: sticky;
   top: 40px;
   flex-shrink: 0;
@@ -64,45 +77,33 @@
 .sidebar-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--color-primary);
   margin-bottom: 6px;
   line-height: 1.4;
 }
 
 .sidebar-author {
   font-size: 0.9rem;
-  color: var(--text-gray);
+  color: var(--color-text-gray);
   margin-bottom: 15px;
   font-weight: 500;
 }
 
 .sidebar-meta span {
   display: inline-block;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--color-light-gray);
+  color: #475569; /* Slate-600, kept for contrast */
   padding: 6px 14px;
   border-radius: 30px;
   font-size: 0.75rem;
   font-weight: 700;
 }
 
-/* Individual meta items (category, language, etc.) */
-.meta-item {
-  display: inline-block;
-  background: #f1f5f9;
-  color: #475569;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  margin-left: 8px;
-}
-
-/* Reading Progress */
+/* --- Reading Progress --- */
 .reading-progress {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--color-border-light);
 }
 
 .progress-label {
@@ -111,19 +112,19 @@
   align-items: center;
   margin-bottom: 8px;
   font-size: 0.75rem;
-  color: var(--text-gray);
+  color: var(--color-text-gray);
   font-weight: 600;
 }
 
 .progress-percent {
-  color: var(--primary);
+  color: var(--color-primary);
   font-weight: 700;
 }
 
 .progress-bar {
   width: 100%;
   height: 8px;
-  background: #e2e8f0;
+  background: var(--color-border-light);
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 8px;
@@ -131,7 +132,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   border-radius: 10px;
   transition: width 0.3s ease;
 }
@@ -139,10 +140,11 @@
 .progress-pages {
   text-align: center;
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: var(--color-placeholder);
   font-weight: 600;
 }
 
+/* --- CONTENT AREA (Main Document) --- */
 .read-content-area {
   flex: 1;
   display: flex;
@@ -151,13 +153,13 @@
 }
 
 .white-paper {
-  background: var(--white);
+  background: var(--color-white);
   width: 100%;
   max-width: 700px;
   min-height: 85vh;
   border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(30, 60, 114, 0.08);
-  border: var(--border);
+  box-shadow: var(--shadow-paper);
+  border: var(--border-main);
   padding: 50px;
   display: flex;
   flex-direction: column;
@@ -171,10 +173,11 @@
   left: 0;
   right: 0;
   height: 6px;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   border-radius: 16px 16px 0 0;
 }
 
+/* PDF/Canvas View */
 .pdf-container {
   display: flex;
   justify-content: center;
@@ -183,6 +186,7 @@
   position: relative;
 }
 
+/* Specific library selector, increased specificity for override */
 .react-pdf__Page__canvas {
   max-width: 100% !important;
   height: auto !important;
@@ -196,15 +200,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
-  border: 2px dashed #e2e8f0;
+  color: var(--color-placeholder);
+  border: 2px dashed var(--color-border-light);
   border-radius: 12px;
   padding: 40px;
   text-align: center;
 }
 
-
-/* Page Navigation Top */
+/* --- PAGE NAVIGATION (Top) --- */
 .page-nav-top {
   display: flex;
   align-items: center;
@@ -212,14 +215,15 @@
   gap: 10px;
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 2px solid #f1f5f9;
+  border-bottom: 2px solid var(--color-light-gray);
+  flex-wrap: wrap; /* Added for better small screen support */
 }
 
 .page-nav-btn {
   width: 40px;
   height: 40px;
-  border: 2px solid #e2e8f0;
-  background: white;
+  border: 2px solid var(--color-border-light);
+  background: var(--color-white);
   border-radius: 10px;
   cursor: pointer;
   font-size: 1rem;
@@ -227,24 +231,21 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  color: var(--primary);
+  color: var(--color-primary);
 }
 
 .page-nav-btn:hover:not(:disabled) {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
-}
-
-.page-nav-btn:hover:not(:disabled) {
-  filter: brightness(0) invert(1);
+  filter: brightness(0) invert(1); /* Invert to white icon */
 }
 
 .page-nav-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
-  background: #f8fafc;
+  background: #f8fafc; /* Very light background */
 }
 
 .page-jump {
@@ -252,9 +253,9 @@
   align-items: center;
   gap: 8px;
   padding: 0 15px;
-  background: #f8fafc;
+  background: #f8fafc; /* Very light background */
   border-radius: 10px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-border-light);
 }
 
 .page-input {
@@ -264,11 +265,12 @@
   background: transparent;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--color-primary);
   text-align: center;
   outline: none;
 }
 
+/* Removes number input spin buttons */
 .page-input::-webkit-inner-spin-button,
 .page-input::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -276,24 +278,24 @@
 }
 
 .page-separator {
-  color: #cbd5e1;
+  color: var(--color-separator);
   font-weight: 600;
   font-size: 1.1rem;
 }
 
 .total-pages {
-  color: #64748b;
+  color: var(--color-text-gray);
   font-weight: 600;
   font-size: 1rem;
   min-width: 40px;
   text-align: center;
 }
 
-/* Page Navigation Bottom */
+/* --- PAGE NAVIGATION (Bottom) --- */
 .page-nav-bottom {
   margin-top: 25px;
   padding-top: 20px;
-  border-top: 2px solid #f1f5f9;
+  border-top: 2px solid var(--color-light-gray);
 }
 
 .page-info {
@@ -305,19 +307,20 @@
 }
 
 .current-page {
-  color: var(--primary);
+  color: var(--color-primary);
   font-weight: 700;
 }
 
 .page-divider {
-  color: #cbd5e1;
+  color: var(--color-separator);
 }
 
 .total-info {
-  color: #64748b;
+  color: var(--color-text-gray);
   font-weight: 500;
 }
 
+/* --- NAVIGATION CONTROLS (Side/Fixed) --- */
 .read-controls {
   display: flex;
   flex-direction: column;
@@ -334,8 +337,8 @@
   height: 50px;
   border-radius: 14px;
   border: none;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: var(--color-white);
   font-size: 1.4rem;
   cursor: pointer;
   display: flex;
@@ -351,13 +354,13 @@
 }
 
 .nav-btn:disabled {
-  background: #cbd5e1;
+  background: var(--color-separator);
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
 }
 
-/* Reviews Container */
+/* Other Components */
 .reviews-container {
   max-width: 1200px;
   margin: 2rem auto;
@@ -367,8 +370,8 @@
 .toggle-reviews-btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Kept original gradient */
+  color: var(--color-white);
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -384,30 +387,29 @@
 }
 
 .page-indicator {
-  background: white;
+  background: var(--color-white);
   padding: 8px 12px;
   border-radius: 10px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--color-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-border-light);
   white-space: nowrap;
   text-align: center;
   min-width: 50px;
 }
 
-
+/* --- MEDIA QUERIES (Mobile/Tablet) --- */
 @media (max-width: 900px) {
   .read-mode-container {
-    padding-bottom: 100px;
+    padding-bottom: 100px; /* Keep space for fixed bottom controls */
   }
 
   .read-layout {
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-    padding-top: 20px;
+    padding: 20px; /* Reduced top padding */
     gap: 20px;
   }
 
@@ -423,26 +425,37 @@
     padding: 15px;
   }
 
+  /* Specificity for mobile sidebar info */
+  .sidebar-info {
+    flex: 1;
+    /* Added to ensure content wraps properly in small screen layout */
+    min-width: 0; 
+  }
+
   .sidebar-cover-wrapper {
     width: 70px;
-    aspect-ratio: auto;
     height: 100px;
+    aspect-ratio: auto; /* Allow height override */
     margin-bottom: 0;
     flex-shrink: 0;
   }
 
-  .sidebar-info {
-    flex: 1;
-  }
-
   .sidebar-title {
     font-size: 1.1rem;
+    /* Truncation logic is correct */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-
+  
+  /* Reading Progress remains mostly as-is, but check top margin/padding */
+  .reading-progress {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-border-light); /* Ensure correct variable */
+  }
+  
   .white-paper {
     padding: 25px 20px;
     min-height: 60vh;
@@ -452,6 +465,12 @@
     flex-wrap: wrap;
     gap: 8px;
     padding: 15px 10px;
+    /* Removed redundant border-bottom from desktop style as it might create a double border with the one in white-paper */
+    border-bottom: none; 
+  }
+  
+  .page-nav-top + .pdf-container {
+    /* Adding padding/margin below the wrapped nav if needed, but not required if it's inside white-paper */
   }
 
   .page-nav-btn {
@@ -481,12 +500,8 @@
     font-size: 0.8rem;
     flex-wrap: wrap;
   }
-
-  .reading-progress {
-    margin-top: 15px;
-    padding-top: 15px;
-  }
-
+  
+  /* Mobile fixed controls */
   .read-controls {
     flex-direction: row;
     position: fixed;
@@ -501,9 +516,8 @@
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.8);
     gap: 15px;
+    width: auto; /* Ensure it only takes needed width */
   }
-
-  
 
   .nav-btn {
     width: 45px;
