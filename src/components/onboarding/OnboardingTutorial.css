@@ -1,0 +1,259 @@
+/* Onboarding Tutorial Styles */
+
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.onboarding-overlay.show {
+  opacity: 1;
+}
+
+.onboarding-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.5s ease;
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.onboarding-modal.animate-in {
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.onboarding-header {
+  margin-bottom: 24px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.onboarding-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Progress Bar */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar-onboarding {
+  flex: 1;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill-onboarding {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* Content */
+.onboarding-content {
+  margin: 24px 0;
+}
+
+.onboarding-description {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+/* Feature Indicators */
+.feature-indicators {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.indicator.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: scale(1.2);
+}
+
+.indicator.completed {
+  background: #4caf50;
+}
+
+/* Footer */
+.onboarding-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 32px;
+}
+
+.tutorial-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.tutorial-btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.tutorial-btn.primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.tutorial-btn.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tutorial-btn.secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #e0e0e0;
+}
+
+.tutorial-btn.secondary:hover:not(:disabled) {
+  background: #e8e8e8;
+  transform: translateY(-2px);
+}
+
+.tutorial-btn.secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.skip-tutorial-btn {
+  padding: 12px 16px;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.skip-tutorial-btn:hover {
+  background: #f8f8f8;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .onboarding-modal {
+    padding: 24px;
+    max-width: 100%;
+    margin: 16px;
+  }
+
+  .onboarding-title {
+    font-size: 20px;
+  }
+
+  .onboarding-description {
+    font-size: 15px;
+  }
+
+  .onboarding-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tutorial-btn,
+  .skip-tutorial-btn {
+    width: 100%;
+  }
+
+  .header-content {
+    gap: 12px;
+  }
+}
