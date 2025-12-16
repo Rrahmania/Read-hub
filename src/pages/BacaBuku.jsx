@@ -137,7 +137,13 @@ const BacaBuku = () => {
             <h1 className="sidebar-title">{book.title}</h1>
             <p className="sidebar-author">{book.author}</p>
             <div className="sidebar-meta">
-              <span>{book.category}</span>
+              <span className="meta-item">{book.category}</span>
+              {book.language && (
+                <span className="meta-item">• {book.language}</span>
+              )}
+              {!book.language && book.language_code && (
+                <span className="meta-item">• {book.language_code}</span>
+              )}
             </div>
             
             {/* Progress Reading */}
