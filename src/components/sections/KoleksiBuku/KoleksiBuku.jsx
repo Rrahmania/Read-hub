@@ -137,12 +137,6 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                     📖 Baca
                   </button>
                   <button
-                    className="btn btn-download"
-                    onClick={() => onDownload && onDownload(book, showToast)}
-                  >
-                    ⬇️ Download
-                  </button>
-                  <button
                     className="btn btn-fav"
                     onClick={() =>
                       onAddToFavorite && onAddToFavorite(book, showToast)
@@ -165,3 +159,4 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
 };
 
 export default KoleksiBuku;
+
