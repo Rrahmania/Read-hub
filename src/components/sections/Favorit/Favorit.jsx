@@ -131,12 +131,6 @@ const Favorit = ({
                       📖 Baca
                     </button>
                     <button
-                      className="btn btn-download"
-                      onClick={() => onDownload(book, showToast)}
-                    >
-                      ⬇️ Download
-                    </button>
-                    <button
                       className="btn btn-remove"
                       onClick={() => onRemoveFavorite(book, showToast)}
                     >
@@ -154,3 +148,4 @@ const Favorit = ({
 };
 
 export default Favorit;
+
