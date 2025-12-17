@@ -1,135 +1,158 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { addBook } from "../services/bookService";
+import { getBooks, deleteBook } from "../services/bookService";
 import { useToast } from "../context/ToastContext";
-import "./AddBook.css";
+import "./ManageBooks.css";
 
-function AddBook({ userRole }) {
+function ManageBooks({ userRole }) {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const [form, setForm] = useState({
-    title: "",
-    author: "",
-    category: "",
-    cover_path: "",
-    pdf_path: "",
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     if (!userRole || userRole !== "admin") {
       navigate("/");
       showToast("Akses ditolak: hanya admin", "error");
-    }
-  }, [userRole, navigate]);
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    if (!form.title || !form.pdf_path) {
-      setError("Judul dan PDF wajib diisi");
       return;
     }
+    fetchBooks();
+  }, [userRole, navigate, showToast]); // Tambahkan showToast ke dependencies
 
+  const fetchBooks = async () => {
     try {
       setLoading(true);
-      await addBook(form);
-      showToast("✅ Buku berhasil ditambahkan", "success");
-      navigate("/manage-books");
-    } catch (err) {
-      console.error(err);
-      setError("❌ Gagal menambahkan buku");
-      showToast("❌ Gagal menambahkan buku", "error");
+      const data = await getBooks();
+      setBooks(data);
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      showToast("Gagal mengambil data buku", "error");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDelete = async (book) => {
+    // Menghapus window.confirm() agar penghapusan dilakukan secara langsung
+    
+    try {
+      setDeleting(book.id);
+      await deleteBook(book.id);
+      showToast(`Buku "${book.title}" berhasil dihapus`, "success");
+      // Refresh list
+      await fetchBooks();
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      showToast("Gagal menghapus buku", "error");
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="manage-books-container">
+        <div className="loading">Memuat data buku...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="add-book-container">
-      <h2>📚 Tambah Buku Baru</h2>
-      {error && <div className="error">{error}</div>}
-      <form onSubmit={handleSubmit} className="add-book-form">
-        <div className="form-group">
-          <label htmlFor="title">Judul Buku *</label>
-          <input
-            id="title"
-            type="text"
-            name="title"
-            placeholder="Masukkan judul buku"
-            value={form.title}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="author">Penulis</label>
-          <input
-            id="author"
-            type="text"
-            name="author"
-            placeholder="Masukkan nama penulis"
-            value={form.author}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="category">Kategori</label>
-          <input
-            id="category"
-            type="text"
-            name="category"
-            placeholder="Contoh: Fiksi, Non-Fiksi, Teknologi"
-            value={form.category}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="cover_path">URL Cover Buku</label>
-          <input
-            id="cover_path"
-            type="text"
-            name="cover_path"
-            placeholder="https://example.com/cover.jpg"
-            value={form.cover_path}
-            onChange={handleChange}
-          />
-          {form.cover_path && (
-            <div className="preview-cover">
-              <img src={form.cover_path} alt="Preview Cover" />
-            </div>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="pdf_path">URL PDF Buku *</label>
-          <input
-            id="pdf_path"
-            type="text"
-            name="pdf_path"
-            placeholder="https://example.com/book.pdf"
-            value={form.pdf_path}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Menyimpan..." : "💾 Simpan Buku"}
+    <div className="manage-books-container">
+      <div className="manage-header">
+        <h2>📚 Kelola Buku</h2>
+        <button 
+          className="btn-add-new"
+          onClick={() => navigate("/add-book")}
+        >
+          ➕ Tambah Buku Baru
         </button>
-      </form>
+      </div>
+
+      {books.length === 0 ? (
+        <div className="empty-state">
+          <p>Belum ada buku. Tambahkan buku pertama Anda!</p>
+          <button onClick={() => navigate("/add-book")}>
+            Tambah Buku
+          </button>
+        </div>
+      ) : (
+        <div className="books-table-container">
+          <table className="books-table">
+            <thead>
+              <tr>
+                <th>Cover</th>
+                <th>Judul</th>
+                <th>Penulis</th>
+                <th>Kategori</th>
+                <th>Ditambahkan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {books.map((book) => (
+                <tr key={book.id}>
+                  <td>
+                    {book.cover_path ? (
+                      <img 
+                        src={book.cover_path} 
+                        alt={book.title}
+                        className="book-cover-thumb"
+                      />
+                    ) : (
+                      <div className="no-cover">📖</div>
+                    )}
+                  </td>
+                  <td className="book-title">{book.title}</td>
+                  <td>{book.author || "-"}</td>
+                  <td>
+                    <span className="category-badge">
+                      {book.category || "Umum"}
+                    </span>
+                  </td>
+                  <td className="date-cell">
+                    {new Date(book.created_at).toLocaleDateString("id-ID")}
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        className="btn-view"
+                        onClick={() => navigate(`/read/${book.id}`)}
+                        title="Lihat Buku"
+                      >
+                        👁️
+                      </button>
+                      <button
+                        className="btn-edit"
+                        onClick={() => navigate(`/edit-book/${book.id}`)}
+                        title="Edit Buku"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDelete(book)}
+                        disabled={deleting === book.id}
+                        title="Hapus Buku"
+                      >
+                        {deleting === book.id ? "⏳" : "🗑️"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="books-summary">
+        Total: {books.length} buku
+      </div>
     </div>
   );
 }
 
-export default AddBook;
+export default ManageBooks;
