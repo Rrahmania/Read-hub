@@ -155,36 +155,34 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s;
+  font-weight: 700;
 }
 
 .btn-edit {
-  background: #0b7dda; /* solid, balanced blue */
+  background: #1ea0ff;
   color: #ffffff;
-  box-shadow: 0 6px 18px rgba(11, 125, 218, 0.18);
-  font-weight: 700;
-  padding: 0.55rem 1.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(30, 160, 255, 0.35);
 }
 
 .btn-edit:hover {
-  background: #095fb0;
+  background: #0094ff;
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(9, 95, 176, 0.22);
+  box-shadow: 0 8px 22px rgba(0, 148, 255, 0.45);
 }
 
+/* ✅ Tombol Hapus — Merah terang */
 .btn-delete {
-  background: #ff3b30; /* vivid, high-contrast red */
+  background: #ff5b50;
   color: #ffffff;
-  box-shadow: 0 6px 18px rgba(255, 59, 48, 0.18);
-  font-weight: 700;
-  padding: 0.55rem 1.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(255, 91, 80, 0.35);
 }
 
 .btn-delete:hover {
-  background: #c92b22;
+  background: #ff3d33;
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(201, 43, 34, 0.22);
+  box-shadow: 0 8px 22px rgba(255, 61, 51, 0.45);
 }
 
 .btn-delete:disabled {
