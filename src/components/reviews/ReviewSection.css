@@ -147,49 +147,54 @@
   margin-top: 1rem;
 }
 
+/* ✅ TOMBOL EDIT - WARNA KUNING */
 .btn-edit {
   padding: 0.5rem 1.5rem;
   background: #FFC107; /* Kuning */
-  color: #000; /* Teks hitam */
-  border: none;
+  color: #000000; /* Teks hitam */
+  border: 2px solid #000000; /* Stroke hitam */
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s;
   font-weight: 700;
-  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .btn-edit:hover {
-  background: #FFB300; 
+  background: #FFB300; /* Kuning lebih gelap saat hover */
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(255, 179, 0, 0.4);
-  color: #000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: #000000;
+  border-color: #000000;
 }
 
-
+/* ✅ TOMBOL HAPUS - WARNA MERAH */
 .btn-delete {
   padding: 0.5rem 1.5rem;
-  background: #F44336; 
-  color: #FFF; 
-  border: none;
+  background: #FF0000; /* Merah */
+  color: #000000; /* Teks hitam */
+  border: 2px solid #000000; /* Stroke hitam */
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s;
   font-weight: 700;
-  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .btn-delete:hover {
-  background: #D32F2F; /* Merah lebih gelap saat hover */
+  background: #CC0000; /* Merah lebih gelap saat hover */
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(211, 47, 47, 0.4);
-  color: #FFF;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: #000000;
+  border-color: #000000;
 }
 
 .btn-delete:disabled {
   background: #ccc;
+  color: #666;
+  border-color: #999;
   cursor: not-allowed;
   box-shadow: none;
 }
