@@ -2,26 +2,24 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBooks, deleteBook } from "../services/bookService";
 import { useToast } from "../context/ToastContext";
-import { useAuth } from "../context/AuthContext";
 import "./ManageBooks.css";
 
-function ManageBooks() {
+function ManageBooks({ userRole }) {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { userRole } = useAuth();
 
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
-    if (userRole !== "admin") {
-      showToast("Akses ditolak: hanya admin", "error");
+    if (!userRole || userRole !== "admin") {
       navigate("/");
+      showToast("Akses ditolak: hanya admin", "error");
       return;
     }
     fetchBooks();
-  }, [userRole]);
+  }, [userRole, navigate, showToast]); // Tambahkan showToast ke dependencies
 
   const fetchBooks = async () => {
     try {
@@ -37,11 +35,14 @@ function ManageBooks() {
   };
 
   const handleDelete = async (book) => {
+    // Menghapus window.confirm() agar penghapusan dilakukan secara langsung
+    
     try {
       setDeleting(book.id);
       await deleteBook(book.id);
       showToast(`Buku "${book.title}" berhasil dihapus`, "success");
-      fetchBooks();
+      // Refresh list
+      await fetchBooks();
     } catch (error) {
       console.error("Error deleting book:", error);
       showToast("Gagal menghapus buku", "error");
@@ -62,7 +63,10 @@ function ManageBooks() {
     <div className="manage-books-container">
       <div className="manage-header">
         <h2>📚 Kelola Buku</h2>
-        <button className="btn-add-new" onClick={() => navigate("/add-book")}>
+        <button 
+          className="btn-add-new"
+          onClick={() => navigate("/add-book")}
+        >
           ➕ Tambah Buku Baru
         </button>
       </div>
@@ -70,7 +74,9 @@ function ManageBooks() {
       {books.length === 0 ? (
         <div className="empty-state">
           <p>Belum ada buku. Tambahkan buku pertama Anda!</p>
-          <button onClick={() => navigate("/add-book")}>Tambah Buku</button>
+          <button onClick={() => navigate("/add-book")}>
+            Tambah Buku
+          </button>
         </div>
       ) : (
         <div className="books-table-container">
@@ -90,8 +96,8 @@ function ManageBooks() {
                 <tr key={book.id}>
                   <td>
                     {book.cover_path ? (
-                      <img
-                        src={book.cover_path}
+                      <img 
+                        src={book.cover_path} 
                         alt={book.title}
                         className="book-cover-thumb"
                       />
@@ -114,12 +120,14 @@ function ManageBooks() {
                       <button
                         className="btn-view"
                         onClick={() => navigate(`/read/${book.id}`)}
+                        title="Lihat Buku"
                       >
                         👁️
                       </button>
                       <button
                         className="btn-edit"
                         onClick={() => navigate(`/edit-book/${book.id}`)}
+                        title="Edit Buku"
                       >
                         ✏️
                       </button>
@@ -127,6 +135,7 @@ function ManageBooks() {
                         className="btn-delete"
                         onClick={() => handleDelete(book)}
                         disabled={deleting === book.id}
+                        title="Hapus Buku"
                       >
                         {deleting === book.id ? "⏳" : "🗑️"}
                       </button>
@@ -139,7 +148,9 @@ function ManageBooks() {
         </div>
       )}
 
-      <div className="books-summary">Total: {books.length} buku</div>
+      <div className="books-summary">
+        Total: {books.length} buku
+      </div>
     </div>
   );
 }
