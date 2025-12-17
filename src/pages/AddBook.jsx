@@ -42,7 +42,7 @@ function AddBook({ userRole }) {
       setLoading(true);
       await addBook(form);
       showToast("✅ Buku berhasil ditambahkan", "success");
-      navigate("/");
+      navigate("/manage-books");
     } catch (err) {
       console.error(err);
       setError("❌ Gagal menambahkan buku");
@@ -133,3 +133,4 @@ function AddBook({ userRole }) {
 }
 
 export default AddBook;
+
