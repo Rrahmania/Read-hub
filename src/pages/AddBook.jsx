@@ -11,13 +11,59 @@ function AddBook({ userRole }) {
   const [form, setForm] = useState({
     title: "",
     author: "",
-    category: "",
+    categories: [], // Ganti dari category menjadi categories (array)
     cover_path: "",
     pdf_path: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Daftar kategori tersedia
+  const availableCategories = [
+    // Fiksi
+    { value: "Novel", label: "Novel", group: "Fiksi" },
+    { value: "Cerpen", label: "Cerpen", group: "Fiksi" },
+    { value: "Fantasi", label: "Fantasi", group: "Fiksi" },
+    { value: "Petualangan", label: "Petualangan", group: "Fiksi" },
+    { value: "Romansa", label: "Romansa", group: "Fiksi" },
+    { value: "Thriller", label: "Thriller", group: "Fiksi" },
+    { value: "Horor", label: "Horor", group: "Fiksi" },
+    { value: "Misteri", label: "Misteri", group: "Fiksi" },
+    { value: "Sci-Fi", label: "Sci-Fi", group: "Fiksi" },
+    { value: "Drama", label: "Drama", group: "Fiksi" },
+    { value: "Komedi", label: "Komedi", group: "Fiksi" },
+    
+    // Non-Fiksi
+    { value: "Biografi", label: "Biografi", group: "Non-Fiksi" },
+    { value: "Sejarah", label: "Sejarah", group: "Non-Fiksi" },
+    { value: "Motivasi", label: "Motivasi", group: "Non-Fiksi" },
+    { value: "Pengembangan Diri", label: "Pengembangan Diri", group: "Non-Fiksi" },
+    { value: "Bisnis", label: "Bisnis", group: "Non-Fiksi" },
+    { value: "Ekonomi", label: "Ekonomi", group: "Non-Fiksi" },
+    { value: "Psikologi", label: "Psikologi", group: "Non-Fiksi" },
+    { value: "Filsafat", label: "Filsafat", group: "Non-Fiksi" },
+    { value: "Agama", label: "Agama", group: "Non-Fiksi" },
+    { value: "Sosial", label: "Sosial", group: "Non-Fiksi" },
+    { value: "Politik", label: "Politik", group: "Non-Fiksi" },
+    
+    // Akademik
+    { value: "Pendidikan", label: "Pendidikan", group: "Akademik" },
+    { value: "Teknologi", label: "Teknologi", group: "Akademik" },
+    { value: "Komputer", label: "Komputer", group: "Akademik" },
+    { value: "Sains", label: "Sains", group: "Akademik" },
+    { value: "Matematika", label: "Matematika", group: "Akademik" },
+    { value: "Kedokteran", label: "Kedokteran", group: "Akademik" },
+    { value: "Hukum", label: "Hukum", group: "Akademik" },
+    { value: "Karya Ilmiah", label: "Karya Ilmiah", group: "Akademik" },
+    
+    // Lainnya
+    { value: "Anak-anak", label: "Anak-anak", group: "Lainnya" },
+    { value: "Komik", label: "Komik", group: "Lainnya" },
+    { value: "Manga", label: "Manga", group: "Lainnya" },
+    { value: "Ensiklopedia", label: "Ensiklopedia", group: "Lainnya" },
+    { value: "Kamus", label: "Kamus", group: "Lainnya" },
+  ];
 
   useEffect(() => {
     if (!userRole || userRole !== "admin") {
@@ -26,8 +72,18 @@ function AddBook({ userRole }) {
     }
   }, [userRole, navigate, showToast]);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name === "categories") {
+      // Untuk multiple select, kita perlu mengambil semua option yang selected
+      const selectedOptions = Array.from(e.target.selectedOptions);
+      const selectedValues = selectedOptions.map(option => option.value);
+      setForm({ ...form, categories: selectedValues });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,13 +94,14 @@ function AddBook({ userRole }) {
       return;
     }
 
-    if (!form.category) {
-      setError("Kategori wajib dipilih");
+    if (form.categories.length === 0) {
+      setError("Pilih minimal satu kategori");
       return;
     }
 
     try {
       setLoading(true);
+      // Kirim categories sebagai array
       await addBook(form);
       showToast("✅ Buku berhasil ditambahkan", "success");
       navigate("/manage-books");
@@ -96,70 +153,56 @@ function AddBook({ userRole }) {
           />
         </div>
 
-        {/* Kategori */}
+        {/* Kategori - MULTIPLE SELECT */}
         <div className="form-group">
-          <label htmlFor="category">Kategori *</label>
+          <label htmlFor="categories">Kategori * (Bisa pilih lebih dari satu)</label>
+          <div className="select-hint">Tahan Ctrl (Windows) atau Cmd (Mac) untuk memilih multiple</div>
           <select
-            id="category"
-            name="category"
-            value={form.category}
+            id="categories"
+            name="categories"
+            value={form.categories}
             onChange={handleChange}
+            multiple
             required
             disabled={loading}
+            size="6" // Menampilkan 6 baris sekaligus
+            className="multi-select"
           >
-            <option value="">-- Pilih Kategori --</option>
-            
-            {/* Fiksi */}
-            <optgroup label="Fiksi">
-              <option value="Novel">Novel</option>
-              <option value="Cerpen">Cerpen</option>
-              <option value="Fantasi">Fantasi</option>
-              <option value="Petualangan">Petualangan</option>
-              <option value="Romansa">Romansa</option>
-              <option value="Thriller">Thriller</option>
-              <option value="Horor">Horor</option>
-              <option value="Misteri">Misteri</option>
-              <option value="Sci-Fi">Sci-Fi</option>
-              <option value="Drama">Drama</option>
-              <option value="Komedi">Komedi</option>
-            </optgroup>
-            
-            {/* Non-Fiksi */}
-            <optgroup label="Non-Fiksi">
-              <option value="Biografi">Biografi</option>
-              <option value="Sejarah">Sejarah</option>
-              <option value="Motivasi">Motivasi</option>
-              <option value="Pengembangan Diri">Pengembangan Diri</option>
-              <option value="Bisnis">Bisnis</option>
-              <option value="Ekonomi">Ekonomi</option>
-              <option value="Psikologi">Psikologi</option>
-              <option value="Filsafat">Filsafat</option>
-              <option value="Agama">Agama</option>
-              <option value="Sosial">Sosial</option>
-              <option value="Politik">Politik</option>
-            </optgroup>
-            
-            {/* Akademik */}
-            <optgroup label="Akademik">
-              <option value="Pendidikan">Pendidikan</option>
-              <option value="Teknologi">Teknologi</option>
-              <option value="Komputer">Komputer</option>
-              <option value="Sains">Sains</option>
-              <option value="Matematika">Matematika</option>
-              <option value="Kedokteran">Kedokteran</option>
-              <option value="Hukum">Hukum</option>
-              <option value="Karya Ilmiah">Karya Ilmiah</option>
-            </optgroup>
-            
-            {/* Lainnya */}
-            <optgroup label="Lainnya">
-              <option value="Anak-anak">Anak-anak</option>
-              <option value="Komik">Komik</option>
-              <option value="Manga">Manga</option>
-              <option value="Ensiklopedia">Ensiklopedia</option>
-              <option value="Kamus">Kamus</option>
-            </optgroup>
+            {availableCategories.map((cat) => (
+              <option key={cat.value} value={cat.value}>
+                {cat.label}
+              </option>
+            ))}
           </select>
+          
+          {/* Menampilkan kategori yang dipilih */}
+          {form.categories.length > 0 && (
+            <div className="selected-categories">
+              <strong>Kategori terpilih:</strong>
+              <div className="categories-tags">
+                {form.categories.map((catValue) => {
+                  const category = availableCategories.find(c => c.value === catValue);
+                  return (
+                    <span key={catValue} className="category-tag">
+                      {category?.label || catValue}
+                      <button 
+                        type="button" 
+                        className="remove-tag"
+                        onClick={() => {
+                          setForm({
+                            ...form,
+                            categories: form.categories.filter(c => c !== catValue)
+                          });
+                        }}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Cover */}
