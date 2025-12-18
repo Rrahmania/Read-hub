@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// src/components/sections/KoleksiBuku/KoleksiBuku.jsx
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../../context/ToastContext";
 import { getBookReviews } from "../../../services/reviewService";
@@ -16,21 +17,67 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
 
   const [ratings, setRatings] = useState({});
 
-  // Daftar genre yang tersedia (ambil dari semua buku)
-  const allGenres = React.useMemo(() => {
+  // Daftar kategori yang sama dengan AddBook.jsx
+  const categoryGroups = {
+    "Fiksi": [
+      { value: "Novel", label: "Novel" },
+      { value: "Cerpen", label: "Cerpen" },
+      { value: "Fantasi", label: "Fantasi" },
+      { value: "Petualangan", label: "Petualangan" },
+      { value: "Romansa", label: "Romansa" },
+      { value: "Thriller", label: "Thriller" },
+      { value: "Horor", label: "Horor" },
+      { value: "Misteri", label: "Misteri" },
+      { value: "Sci-Fi", label: "Sci-Fi" },
+      { value: "Drama", label: "Drama" },
+      { value: "Komedi", label: "Komedi" },
+    ],
+    "Non-Fiksi": [
+      { value: "Biografi", label: "Biografi" },
+      { value: "Sejarah", label: "Sejarah" },
+      { value: "Motivasi", label: "Motivasi" },
+      { value: "Pengembangan Diri", label: "Pengembangan Diri" },
+      { value: "Bisnis", label: "Bisnis" },
+      { value: "Ekonomi", label: "Ekonomi" },
+      { value: "Psikologi", label: "Psikologi" },
+      { value: "Filsafat", label: "Filsafat" },
+      { value: "Agama", label: "Agama" },
+      { value: "Sosial", label: "Sosial" },
+      { value: "Politik", label: "Politik" },
+    ],
+    "Akademik": [
+      { value: "Pendidikan", label: "Pendidikan" },
+      { value: "Teknologi", label: "Teknologi" },
+      { value: "Komputer", label: "Komputer" },
+      { value: "Sains", label: "Sains" },
+      { value: "Matematika", label: "Matematika" },
+      { value: "Kedokteran", label: "Kedokteran" },
+      { value: "Hukum", label: "Hukum" },
+      { value: "Karya Ilmiah", label: "Karya Ilmiah" },
+    ],
+    "Lainnya": [
+      { value: "Anak-anak", label: "Anak-anak" },
+      { value: "Komik", label: "Komik" },
+      { value: "Manga", label: "Manga" },
+      { value: "Ensiklopedia", label: "Ensiklopedia" },
+      { value: "Kamus", label: "Kamus" },
+    ]
+  };
+
+  // Ambil semua genre yang tersedia dari books
+  const availableGenres = useMemo(() => {
     const genres = new Set();
     safeBooks.forEach(book => {
       if (book.categories && Array.isArray(book.categories)) {
-        book.categories.forEach(cat => genres.add(cat));
+        book.categories.forEach(cat => {
+          if (cat) genres.add(cat.trim());
+        });
       } else if (book.category) {
-        genres.add(book.category);
+        genres.add(book.category.trim());
       }
     });
     return Array.from(genres).sort();
   }, [safeBooks]);
-
-  // Genre populer untuk quick filter
-  const popularGenres = ["Novel", "Pendidikan", "Teknologi", "Bisnis", "Sejarah", "Anak-anak"];
 
   useEffect(() => {
     let mounted = true;
@@ -80,6 +127,14 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
     setSearchTerm("");
     setSelectedGenres([]);
     setSortOption("terbaru");
+    showToast("Filter berhasil direset", "info");
+  };
+
+  // Check if a book has selected genres
+  const bookHasGenres = (book) => {
+    const bookGenres = book.categories || (book.category ? [book.category] : []);
+    return selectedGenres.length === 0 || 
+           selectedGenres.some(genre => bookGenres.includes(genre));
   };
 
   // Filter books berdasarkan search term dan genre
@@ -92,10 +147,7 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
     const matchesSearch = title.includes(term) || author.includes(term);
     
     // Cek genre filter
-    const matchesGenre = selectedGenres.length === 0 || 
-      (book.categories && Array.isArray(book.categories)
-        ? book.categories.some(cat => selectedGenres.includes(cat))
-        : book.category && selectedGenres.includes(book.category));
+    const matchesGenre = bookHasGenres(book);
     
     return matchesSearch && matchesGenre;
   });
@@ -104,9 +156,9 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
   const sortedBooks = [...filteredBooks].sort((a, b) => {
     switch (sortOption) {
       case "terbaru":
-        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        return new Date(b.created_at || b.updated_at || 0) - new Date(a.created_at || a.updated_at || 0);
       case "terlama":
-        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+        return new Date(a.created_at || a.updated_at || 0) - new Date(b.created_at || b.updated_at || 0);
       case "rating-tinggi":
         const ratingA = ratings[a.id]?.average_rating || a.average_rating || 0;
         const ratingB = ratings[b.id]?.average_rating || b.average_rating || 0;
@@ -119,10 +171,36 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
         return (a.title || "").localeCompare(b.title || "");
       case "z-a":
         return (b.title || "").localeCompare(a.title || "");
+      case "populer":
+        const reviewsA = ratings[a.id]?.total_reviews || 0;
+        const reviewsB = ratings[b.id]?.total_reviews || 0;
+        return reviewsB - reviewsA;
       default:
         return 0;
     }
   });
+
+  // Hitung buku per genre untuk statistik
+  const genreStats = useMemo(() => {
+    const stats = {};
+    safeBooks.forEach(book => {
+      const genres = book.categories || (book.category ? [book.category] : []);
+      genres.forEach(genre => {
+        if (genre) {
+          stats[genre] = (stats[genre] || 0) + 1;
+        }
+      });
+    });
+    return stats;
+  }, [safeBooks]);
+
+  // Genre populer berdasarkan jumlah buku
+  const popularGenres = useMemo(() => {
+    return Object.entries(genreStats)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 8)
+      .map(([genre]) => genre);
+  }, [genreStats]);
 
   return (
     <section className="koleksi-section">
@@ -157,7 +235,7 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                 className={`filter-toggle-btn ${showFilter ? 'active' : ''}`}
                 onClick={() => setShowFilter(!showFilter)}
               >
-                🎯 Filter
+                {showFilter ? "✕ Tutup Filter" : "🎯 Filter Buku"}
                 {selectedGenres.length > 0 && (
                   <span className="filter-count">{selectedGenres.length}</span>
                 )}
@@ -172,6 +250,7 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                 <option value="terlama">📅 Terlama</option>
                 <option value="rating-tinggi">⭐ Rating Tertinggi</option>
                 <option value="rating-rendah">⭐ Rating Terendah</option>
+                <option value="populer">🔥 Paling Populer</option>
                 <option value="a-z">🔤 A-Z</option>
                 <option value="z-a">🔤 Z-A</option>
               </select>
@@ -179,115 +258,197 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
           </div>
         </div>
 
-        {/* Filter Panel */}
+        {/* Filter Panel dengan Style seperti AddBook.jsx */}
         {showFilter && (
           <div className="filter-panel">
             <div className="filter-header">
-              <h3>Filter Genre</h3>
+              <h3>
+                <span className="filter-icon">🎯</span>
+                Filter Genre Buku
+              </h3>
               <div className="filter-actions">
                 {selectedGenres.length > 0 && (
                   <button 
-                    className="clear-filter-btn"
-                    onClick={clearFilters}
+                    className="clear-all-btn"
+                    onClick={() => setSelectedGenres([])}
                   >
-                    🗑️ Hapus Semua
+                    🗑️ Hapus Pilihan
                   </button>
                 )}
                 <button 
-                  className="close-filter-btn"
+                  className="apply-filter-btn"
                   onClick={() => setShowFilter(false)}
                 >
-                  ✕ Tutup
+                  ✅ Terapkan
                 </button>
               </div>
             </div>
 
             {/* Quick Filter - Genre Populer */}
-            <div className="quick-filter-section">
-              <h4>Genre Populer:</h4>
-              <div className="quick-filter-chips">
-                {popularGenres
-                  .filter(genre => allGenres.includes(genre))
-                  .map(genre => (
+            {popularGenres.length > 0 && (
+              <div className="quick-filter-section">
+                <h4>Genre Populer:</h4>
+                <div className="quick-filter-chips">
+                  {popularGenres.map(genre => (
                     <button
                       key={genre}
                       className={`quick-filter-chip ${selectedGenres.includes(genre) ? 'active' : ''}`}
                       onClick={() => toggleGenre(genre)}
                     >
                       {genre}
-                      {selectedGenres.includes(genre) && <span className="check-mark">✓</span>}
-                    </button>
-                  ))
-                }
-              </div>
-            </div>
-
-            {/* All Genres */}
-            <div className="all-genres-section">
-              <h4>Semua Genre ({allGenres.length}):</h4>
-              <div className="genres-grid">
-                {allGenres.map(genre => (
-                  <div key={genre} className="genre-checkbox">
-                    <input
-                      type="checkbox"
-                      id={`genre-${genre}`}
-                      checked={selectedGenres.includes(genre)}
-                      onChange={() => toggleGenre(genre)}
-                    />
-                    <label htmlFor={`genre-${genre}`}>
-                      {genre}
+                      <span className="genre-count">({genreStats[genre] || 0})</span>
                       {selectedGenres.includes(genre) && (
-                        <span className="selected-indicator">✓</span>
+                        <span className="check-mark">✓</span>
                       )}
-                    </label>
-                  </div>
-                ))}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* All Genres dengan Grup seperti AddBook.jsx */}
+            <div className="all-genres-section">
+              <h4>Semua Genre:</h4>
+              
+              <div className="categories-checkbox-container">
+                {Object.entries(categoryGroups).map(([groupName, categories]) => {
+                  // Filter hanya kategori yang ada di buku
+                  const availableCategories = categories.filter(cat => 
+                    availableGenres.includes(cat.value)
+                  );
+                  
+                  if (availableCategories.length === 0) return null;
+                  
+                  return (
+                    <div key={groupName} className="category-group">
+                      <span className="categories-group-label">
+                        {groupName === "Fiksi" && "📚 "}
+                        {groupName === "Non-Fiksi" && "📖 "}
+                        {groupName === "Akademik" && "🎓 "}
+                        {groupName === "Lainnya" && "📌 "}
+                        {groupName}
+                        <span className="group-count">({availableCategories.length})</span>
+                      </span>
+                      
+                      <div className="categories-checkbox-group">
+                        {availableCategories.map((category) => (
+                          <div key={category.value} className="category-checkbox">
+                            <input
+                              type="checkbox"
+                              id={`filter-cat-${category.value}`}
+                              checked={selectedGenres.includes(category.value)}
+                              onChange={() => toggleGenre(category.value)}
+                            />
+                            <label htmlFor={`filter-cat-${category.value}`}>
+                              {category.label}
+                              {genreStats[category.value] && (
+                                <span className="book-count">
+                                  ({genreStats[category.value]})
+                                </span>
+                              )}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
             {/* Selected Genres Preview */}
             {selectedGenres.length > 0 && (
               <div className="selected-genres-preview">
-                <h4>Genre Terpilih:</h4>
+                <div className="selected-header">
+                  <h4>
+                    <span className="selected-icon">✅</span>
+                    Genre Terpilih ({selectedGenres.length})
+                  </h4>
+                  <button 
+                    className="remove-all-btn"
+                    onClick={() => setSelectedGenres([])}
+                  >
+                    Hapus Semua
+                  </button>
+                </div>
+                
                 <div className="selected-genres-tags">
-                  {selectedGenres.map(genre => (
-                    <span key={genre} className="selected-genre-tag">
-                      {genre}
-                      <button 
-                        className="remove-genre-btn"
-                        onClick={() => toggleGenre(genre)}
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  ))}
+                  {selectedGenres.map(genre => {
+                    // Cari label dari kategori
+                    let label = genre;
+                    Object.values(categoryGroups).forEach(group => {
+                      group.forEach(cat => {
+                        if (cat.value === genre) label = cat.label;
+                      });
+                    });
+                    
+                    return (
+                      <span key={genre} className="selected-genre-tag">
+                        {label}
+                        {genreStats[genre] && (
+                          <span className="tag-count"> ({genreStats[genre]})</span>
+                        )}
+                        <button 
+                          className="remove-genre-btn"
+                          onClick={() => toggleGenre(genre)}
+                          title="Hapus genre"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
+
+            {/* Filter Info */}
+            <div className="filter-info">
+              <p className="info-text">
+                ℹ️ Pilih satu atau lebih genre untuk memfilter koleksi buku.
+              </p>
+              {selectedGenres.length > 0 && (
+                <div className="active-filter-info">
+                  <span className="info-icon">📊</span>
+                  <span>
+                    Menampilkan buku dengan genre:{" "}
+                    <strong>{selectedGenres.join(", ")}</strong>
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* Stats Bar */}
         <div className="stats-bar">
-          <span className="stats-item">
-            📚 Total Buku: <strong>{safeBooks.length}</strong>
-          </span>
-          <span className="stats-item">
-            🔍 Ditemukan: <strong>{sortedBooks.length}</strong>
-          </span>
-          {selectedGenres.length > 0 && (
+          <div className="stats-left">
             <span className="stats-item">
-              🎯 Filter Aktif: <strong>{selectedGenres.length} genre</strong>
+              📚 Total Buku: <strong>{safeBooks.length}</strong>
             </span>
-          )}
-          {(searchTerm || selectedGenres.length > 0) && (
-            <button 
-              className="reset-filters-btn"
-              onClick={clearFilters}
-            >
-              ❌ Reset Filter
-            </button>
-          )}
+            <span className="stats-item">
+              🔍 Ditemukan: <strong>{sortedBooks.length}</strong>
+            </span>
+            <span className="stats-item">
+              🏷️ Genre Tersedia: <strong>{availableGenres.length}</strong>
+            </span>
+          </div>
+          
+          <div className="stats-right">
+            {(searchTerm || selectedGenres.length > 0) && (
+              <button 
+                className="reset-filters-btn"
+                onClick={clearFilters}
+              >
+                ❌ Reset Semua Filter
+              </button>
+            )}
+            {selectedGenres.length > 0 && (
+              <span className="active-filters-badge">
+                🎯 {selectedGenres.length} Filter Aktif
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Books Grid */}
@@ -305,6 +466,11 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                         src={book.cover_path}
                         alt={book.title}
                         className="cover-img"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "https://via.placeholder.com/130x190?text=No+Cover";
+                          e.target.className = "cover-img placeholder";
+                        }}
                       />
                     ) : (
                       <div className="placeholder-box">📚</div>
@@ -323,6 +489,13 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                         )}
                       </div>
                     )}
+                    
+                    {/* Rating Badge */}
+                    {bookRating && (
+                      <div className="rating-badge">
+                        ⭐ {parseFloat(bookRating).toFixed(1)}
+                      </div>
+                    )}
                   </div>
 
                   <div className="card-info">
@@ -332,6 +505,22 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                     <p className="book-author">
                       ✍️ {book.author || "Penulis tidak diketahui"}
                     </p>
+                    
+                    {/* Categories */}
+                    {bookCategories.length > 0 && (
+                      <div className="card-categories">
+                        {bookCategories.slice(0, 3).map((cat, idx) => (
+                          <span key={idx} className="category-chip">
+                            {cat}
+                          </span>
+                        ))}
+                        {bookCategories.length > 3 && (
+                          <span className="more-categories-chip">
+                            +{bookCategories.length - 3} lagi
+                          </span>
+                        )}
+                      </div>
+                    )}
                     
                     {/* Rating Section */}
                     {bookRating && (
@@ -362,6 +551,7 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                     <button
                       className="btn btn-read"
                       onClick={() => navigate(`/read/${book.id}`)}
+                      title="Baca buku"
                     >
                       📖 Baca
                     </button>
@@ -370,12 +560,14 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                       onClick={() =>
                         onAddToFavorite && onAddToFavorite(book, showToast)
                       }
+                      title="Tambahkan ke favorit"
                     >
                       ❤️ Favorit
                     </button>
                     <button
                       className="btn btn-details"
                       onClick={() => navigate(`/book/${book.id}`)}
+                      title="Lihat detail buku"
                     >
                       👁️ Detail
                     </button>
@@ -397,7 +589,7 @@ const KoleksiBuku = ({ books = [], onAddToFavorite, onDownload }) => {
                   className="btn btn-primary"
                   onClick={clearFilters}
                 >
-                  Tampilkan Semua Buku
+                  👁️ Tampilkan Semua Buku
                 </button>
               )}
             </div>
