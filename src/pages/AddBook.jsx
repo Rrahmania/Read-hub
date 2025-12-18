@@ -11,7 +11,7 @@ function AddBook({ userRole }) {
   const [form, setForm] = useState({
     title: "",
     author: "",
-    categories: [], // Ganti dari category menjadi categories (array)
+    categories: [], // Array untuk multiple categories
     cover_path: "",
     pdf_path: "",
   });
@@ -19,51 +19,52 @@ function AddBook({ userRole }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Daftar kategori tersedia
-  const availableCategories = [
-    // Fiksi
-    { value: "Novel", label: "Novel", group: "Fiksi" },
-    { value: "Cerpen", label: "Cerpen", group: "Fiksi" },
-    { value: "Fantasi", label: "Fantasi", group: "Fiksi" },
-    { value: "Petualangan", label: "Petualangan", group: "Fiksi" },
-    { value: "Romansa", label: "Romansa", group: "Fiksi" },
-    { value: "Thriller", label: "Thriller", group: "Fiksi" },
-    { value: "Horor", label: "Horor", group: "Fiksi" },
-    { value: "Misteri", label: "Misteri", group: "Fiksi" },
-    { value: "Sci-Fi", label: "Sci-Fi", group: "Fiksi" },
-    { value: "Drama", label: "Drama", group: "Fiksi" },
-    { value: "Komedi", label: "Komedi", group: "Fiksi" },
-    
-    // Non-Fiksi
-    { value: "Biografi", label: "Biografi", group: "Non-Fiksi" },
-    { value: "Sejarah", label: "Sejarah", group: "Non-Fiksi" },
-    { value: "Motivasi", label: "Motivasi", group: "Non-Fiksi" },
-    { value: "Pengembangan Diri", label: "Pengembangan Diri", group: "Non-Fiksi" },
-    { value: "Bisnis", label: "Bisnis", group: "Non-Fiksi" },
-    { value: "Ekonomi", label: "Ekonomi", group: "Non-Fiksi" },
-    { value: "Psikologi", label: "Psikologi", group: "Non-Fiksi" },
-    { value: "Filsafat", label: "Filsafat", group: "Non-Fiksi" },
-    { value: "Agama", label: "Agama", group: "Non-Fiksi" },
-    { value: "Sosial", label: "Sosial", group: "Non-Fiksi" },
-    { value: "Politik", label: "Politik", group: "Non-Fiksi" },
-    
-    // Akademik
-    { value: "Pendidikan", label: "Pendidikan", group: "Akademik" },
-    { value: "Teknologi", label: "Teknologi", group: "Akademik" },
-    { value: "Komputer", label: "Komputer", group: "Akademik" },
-    { value: "Sains", label: "Sains", group: "Akademik" },
-    { value: "Matematika", label: "Matematika", group: "Akademik" },
-    { value: "Kedokteran", label: "Kedokteran", group: "Akademik" },
-    { value: "Hukum", label: "Hukum", group: "Akademik" },
-    { value: "Karya Ilmiah", label: "Karya Ilmiah", group: "Akademik" },
-    
-    // Lainnya
-    { value: "Anak-anak", label: "Anak-anak", group: "Lainnya" },
-    { value: "Komik", label: "Komik", group: "Lainnya" },
-    { value: "Manga", label: "Manga", group: "Lainnya" },
-    { value: "Ensiklopedia", label: "Ensiklopedia", group: "Lainnya" },
-    { value: "Kamus", label: "Kamus", group: "Lainnya" },
-  ];
+  // Kategori dikelompokkan berdasarkan group
+  const categoryGroups = {
+    "Fiksi": [
+      { value: "Novel", label: "Novel" },
+      { value: "Cerpen", label: "Cerpen" },
+      { value: "Fantasi", label: "Fantasi" },
+      { value: "Petualangan", label: "Petualangan" },
+      { value: "Romansa", label: "Romansa" },
+      { value: "Thriller", label: "Thriller" },
+      { value: "Horor", label: "Horor" },
+      { value: "Misteri", label: "Misteri" },
+      { value: "Sci-Fi", label: "Sci-Fi" },
+      { value: "Drama", label: "Drama" },
+      { value: "Komedi", label: "Komedi" },
+    ],
+    "Non-Fiksi": [
+      { value: "Biografi", label: "Biografi" },
+      { value: "Sejarah", label: "Sejarah" },
+      { value: "Motivasi", label: "Motivasi" },
+      { value: "Pengembangan Diri", label: "Pengembangan Diri" },
+      { value: "Bisnis", label: "Bisnis" },
+      { value: "Ekonomi", label: "Ekonomi" },
+      { value: "Psikologi", label: "Psikologi" },
+      { value: "Filsafat", label: "Filsafat" },
+      { value: "Agama", label: "Agama" },
+      { value: "Sosial", label: "Sosial" },
+      { value: "Politik", label: "Politik" },
+    ],
+    "Akademik": [
+      { value: "Pendidikan", label: "Pendidikan" },
+      { value: "Teknologi", label: "Teknologi" },
+      { value: "Komputer", label: "Komputer" },
+      { value: "Sains", label: "Sains" },
+      { value: "Matematika", label: "Matematika" },
+      { value: "Kedokteran", label: "Kedokteran" },
+      { value: "Hukum", label: "Hukum" },
+      { value: "Karya Ilmiah", label: "Karya Ilmiah" },
+    ],
+    "Lainnya": [
+      { value: "Anak-anak", label: "Anak-anak" },
+      { value: "Komik", label: "Komik" },
+      { value: "Manga", label: "Manga" },
+      { value: "Ensiklopedia", label: "Ensiklopedia" },
+      { value: "Kamus", label: "Kamus" },
+    ]
+  };
 
   useEffect(() => {
     if (!userRole || userRole !== "admin") {
@@ -74,15 +75,34 @@ function AddBook({ userRole }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    if (name === "categories") {
-      // Untuk multiple select, kita perlu mengambil semua option yang selected
-      const selectedOptions = Array.from(e.target.selectedOptions);
-      const selectedValues = selectedOptions.map(option => option.value);
-      setForm({ ...form, categories: selectedValues });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
+    setForm({ ...form, [name]: value });
+  };
+
+  // Fungsi untuk toggle kategori
+  const handleCategoryToggle = (categoryValue) => {
+    setForm(prev => {
+      if (prev.categories.includes(categoryValue)) {
+        // Hapus kategori jika sudah ada
+        return {
+          ...prev,
+          categories: prev.categories.filter(c => c !== categoryValue)
+        };
+      } else {
+        // Tambah kategori jika belum ada
+        return {
+          ...prev,
+          categories: [...prev.categories, categoryValue]
+        };
+      }
+    });
+  };
+
+  // Fungsi untuk clear semua kategori
+  const clearAllCategories = () => {
+    setForm(prev => ({
+      ...prev,
+      categories: []
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -101,7 +121,6 @@ function AddBook({ userRole }) {
 
     try {
       setLoading(true);
-      // Kirim categories sebagai array
       await addBook(form);
       showToast("✅ Buku berhasil ditambahkan", "success");
       navigate("/manage-books");
@@ -153,47 +172,79 @@ function AddBook({ userRole }) {
           />
         </div>
 
-        {/* Kategori - MULTIPLE SELECT */}
+        {/* ========== KATEGORI CHECKBOX ========== */}
         <div className="form-group">
           <label htmlFor="categories">Kategori * (Bisa pilih lebih dari satu)</label>
-          <div className="select-hint">Tahan Ctrl (Windows) atau Cmd (Mac) untuk memilih multiple</div>
-          <select
-            id="categories"
-            name="categories"
-            value={form.categories}
-            onChange={handleChange}
-            multiple
-            required
-            disabled={loading}
-            size="6" // Menampilkan 6 baris sekaligus
-            className="multi-select"
-          >
-            {availableCategories.map((cat) => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
+          
+          {/* Container untuk kategori */}
+          <div className="categories-checkbox-container">
+            
+            {/* Loop melalui semua group kategori */}
+            {Object.entries(categoryGroups).map(([groupName, categories]) => (
+              <div key={groupName} className="category-group">
+                <span className="categories-group-label">
+                  {groupName === "Fiksi" && "📚 "}
+                  {groupName === "Non-Fiksi" && "📖 "}
+                  {groupName === "Akademik" && "🎓 "}
+                  {groupName === "Lainnya" && "📌 "}
+                  {groupName}
+                </span>
+                
+                <div className="categories-checkbox-group">
+                  {/* Loop melalui kategori dalam group */}
+                  {categories.map((category) => (
+                    <div key={category.value} className="category-checkbox">
+                      <input
+                        type="checkbox"
+                        id={`cat-${category.value}`}
+                        value={category.value}
+                        checked={form.categories.includes(category.value)}
+                        onChange={() => handleCategoryToggle(category.value)}
+                        disabled={loading}
+                      />
+                      <label htmlFor={`cat-${category.value}`}>
+                        {category.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
-          </select>
+          </div>
           
           {/* Menampilkan kategori yang dipilih */}
           {form.categories.length > 0 && (
             <div className="selected-categories">
-              <strong>Kategori terpilih:</strong>
+              <div className="selected-categories-header">
+                <strong>Kategori terpilih ({form.categories.length}):</strong>
+                <button 
+                  type="button" 
+                  className="clear-categories-btn"
+                  onClick={clearAllCategories}
+                  disabled={loading}
+                >
+                  🗑️ Hapus Semua
+                </button>
+              </div>
+              
               <div className="categories-tags">
                 {form.categories.map((catValue) => {
-                  const category = availableCategories.find(c => c.value === catValue);
+                  // Cari label dari semua kategori
+                  let label = catValue;
+                  Object.values(categoryGroups).forEach(group => {
+                    const found = group.find(cat => cat.value === catValue);
+                    if (found) label = found.label;
+                  });
+                  
                   return (
                     <span key={catValue} className="category-tag">
-                      {category?.label || catValue}
+                      {label}
                       <button 
                         type="button" 
                         className="remove-tag"
-                        onClick={() => {
-                          setForm({
-                            ...form,
-                            categories: form.categories.filter(c => c !== catValue)
-                          });
-                        }}
+                        onClick={() => handleCategoryToggle(catValue)}
+                        title="Hapus kategori"
+                        disabled={loading}
                       >
                         ×
                       </button>
@@ -204,6 +255,7 @@ function AddBook({ userRole }) {
             </div>
           )}
         </div>
+        {/* ========== END KATEGORI CHECKBOX ========== */}
 
         {/* Cover */}
         <div className="form-group">
@@ -219,10 +271,14 @@ function AddBook({ userRole }) {
           />
           {form.cover_path && (
             <div className="preview-cover">
-              <img src={form.cover_path} alt="Preview Cover" onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "https://via.placeholder.com/200x280?text=Cover+Tidak+Tersedia";
-              }} />
+              <img 
+                src={form.cover_path} 
+                alt="Preview Cover" 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "https://via.placeholder.com/200x280?text=Cover+Tidak+Tersedia";
+                }} 
+              />
             </div>
           )}
         </div>
